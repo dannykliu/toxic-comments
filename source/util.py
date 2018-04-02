@@ -11,6 +11,8 @@ import csv
 
 def load(infile):
     """
+        extract toxic comment data from csv file
+        returns a list of lists, where each sublist corresponds to one comment entry (and all its labels)
     """
     index = 0
 
