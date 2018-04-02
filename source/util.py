@@ -8,6 +8,9 @@ Description: Useful functions
 """
 import numpy as np
 import csv
+from string import punctuation
+from collections import defaultdict
+
 
 def load(infile):
     """
@@ -50,3 +53,51 @@ def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :
             y.append(0)
         x.append(line[comment_col])
     return x,y
+
+
+def extract_words(input_string):
+    """
+    Processes the input_string, separating it into "words" based on the presence
+    of spaces, and separating punctuation marks into their own words.
+
+    Parameters
+    --------------------
+        input_string -- string of characters
+
+    Returns
+    --------------------
+        words        -- list of lowercase "words"
+    """
+
+    for c in punctuation:
+        input_string = input_string.replace(c, ' ' + c + ' ')
+    return input_string.lower().split()
+
+
+def extract_dictionary(comments):
+    """
+    Create dictionary from all words in training data
+    """
+    word_list = defaultdict(int)
+    for comment in comments:
+        words = extract_words(comment)
+        for word in words:
+            word_list[word] += 1
+    return word_list
+
+
+def get_data():
+    """
+    Uses bag of words representation to create feature matrix X. Also returns output labels y.
+    """
+    raw_data = load('../data/subsampled_train.csv')
+    comments, y = extract(raw_data)
+    word_list = extract_dictionary(comments)
+    n, d = len(comments), len(word_list)
+    X = np.zeros((n, d))
+    for i in range(len(comments)):
+        words = extract_words(comments[i])
+        for j in range(len(words)):
+            if words[j] in word_list:
+                X[i, j] = 1
+    return np.asarray(X), np.asarray(y)
