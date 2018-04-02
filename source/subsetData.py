@@ -14,7 +14,7 @@ import numpy as np
 import csv
 
 
-def write_data(infile):
+def get_indices(infile):
     """
     """
     predict_cols = [2, 3, 4, 5, 6, 7]
@@ -31,20 +31,24 @@ def write_data(infile):
             if index != 0:
                 if any([int(line[predict_col]) == 1 for predict_col in predict_cols]):
                     toxic_indices.append(index)
-                else: 
+                else:
                     nontoxic_indices.append(index)
-            else: 
+            else:
                 header = line
             index += 1
 
     toxic_indices = np.asarray(toxic_indices)
     nontoxic_indices = np.asarray(nontoxic_indices)
-    random_toxic_indices = np.random.choice(np.arange(len(toxic_indices)), size=1000, replace=False)
-    random_nontoxic_indices = np.random.choice(np.arange(len(nontoxic_indices)), size=1000, replace=False)
+    return data, header, toxic_indices, nontoxic_indices
+
+
+def write_data(outfile, data, header, toxic_indices, nontoxic_indices, num_toxic, num_nontoxic):
+    random_toxic_indices = np.random.choice(np.arange(len(toxic_indices)), size=num_toxic, replace=False)
+    random_nontoxic_indices = np.random.choice(np.arange(len(nontoxic_indices)), size=num_nontoxic, replace=False)
     toxic_indices = toxic_indices[random_toxic_indices]
     nontoxic_indices = nontoxic_indices[random_nontoxic_indices]
 
-    with open('../data/subsampled_train_smaller.csv', 'wb') as csvOut:
+    with open(outfile, 'wb') as csvOut:
         out = csv.writer(csvOut, delimiter=',')
         out.writerow(header)
         for i in nontoxic_indices:
@@ -52,6 +56,26 @@ def write_data(infile):
         for i in toxic_indices:
             out.writerow(data[i])
 
-        
 
-write_data('../data/train.csv')
+def subset_data(infile, outfile):
+    """
+    Create subset of 2% of original dataset, with same class proportions as original dataset
+    """
+    data, header, toxic_indices, nontoxic_indices = get_indices(infile)
+    ratio = 0.02
+    num_toxic = int(ratio * len(toxic_indices))
+    num_nontoxic = int(ratio * len(nontoxic_indices))
+    print num_toxic, num_nontoxic
+    write_data(outfile, data, header, toxic_indices, nontoxic_indices, num_toxic, num_nontoxic)
+
+
+def subsample_data(infile, outfile, n):
+    """
+    Subsample dataset with n examples of positive class and n examples of negative class
+    """
+    data, header, toxic_indices, nontoxic_indices = get_indices(infile)
+    write_data(outfile, data, header, toxic_indices, nontoxic_indices, n, n)
+
+
+subset_data('../data/train.csv', '../data/subset_data.csv')
+subsample_data('../data/train.csv', '../data/subsample_data.csv', 1000)

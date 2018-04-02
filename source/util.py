@@ -31,6 +31,7 @@ def load(infile):
 
     return data
 
+
 def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :        
     """
     Parameters
@@ -52,7 +53,7 @@ def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :
         else: 
             y.append(0)
         x.append(line[comment_col])
-    return x,y
+    return x, y
 
 
 def extract_words(input_string):
@@ -86,11 +87,11 @@ def extract_dictionary(comments):
     return word_list
 
 
-def get_subsampled_data():
+def get_data(infile):
     """
     Uses bag of words representation to create feature matrix X. Also returns output labels y.
     """
-    raw_data = load('../data/subsampled_train_smaller.csv')
+    raw_data = load(infile)
     comments, y = extract(raw_data)
     word_list = extract_dictionary(comments)
     n, d = len(comments), len(word_list)
