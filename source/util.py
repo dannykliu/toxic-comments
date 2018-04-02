@@ -86,11 +86,11 @@ def extract_dictionary(comments):
     return word_list
 
 
-def get_data():
+def get_subsampled_data():
     """
     Uses bag of words representation to create feature matrix X. Also returns output labels y.
     """
-    raw_data = load('../data/subsampled_train.csv')
+    raw_data = load('../data/subsampled_train_smaller.csv')
     comments, y = extract(raw_data)
     word_list = extract_dictionary(comments)
     n, d = len(comments), len(word_list)
