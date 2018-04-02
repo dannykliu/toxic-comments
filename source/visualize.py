@@ -5,6 +5,12 @@ Date: 4/1/18
 Description: 
 """
 
+import numpy as np
+
+import csv
+
+from util import *
+
 def lineplot(x, y, label):
     """
     Make a line plot.
@@ -95,3 +101,49 @@ def plot_scatter(X, y, Xnames, yname):
     plt.ylabel(Xnames[1])
     plt.legend()
     plt.show()
+
+######################################################################
+# data extraction functions
+######################################################################
+
+# def load(infile):
+#     """
+#     """
+#     index = 0
+
+#     data = []   # list of lists, where each sublist is a line of the csv file
+
+#     with open(infile, 'rU') as fid:
+#         csvData = csv.reader(fid, delimiter=',')
+#         data =[]
+
+#         for line in csvData:
+#             data.append(line)
+
+#     return np.array(data)
+
+# def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :        
+#     """
+
+#     Returns
+#     --------------------
+#         x      -- numpy array of shape (n,), feature values
+#         y      -- numpy array of shape (n,), target classes
+#         Xnames -- tuple of strings, names of features
+#         yname  -- string, name of target
+#     """
+
+#    if any([int(line[predict_col]) == 1 for predict_col in predict_cols]):
+#                     toxic_indices.append(index)
+#                 else: 
+#                     nontoxic_indices.append(index)
+#         for line in csvData:
+#             data.append(line)
+
+
+def main(): 
+    data = load('../data/subsampled_train.csv')
+    print data.shape
+
+if __name__ == "__main__":
+    main()
