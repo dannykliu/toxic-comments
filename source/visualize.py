@@ -9,7 +9,7 @@ import numpy as np
 
 import csv
 
-from util import *
+from util import *   # data extraction functions
 
 def lineplot(x, y, label):
     """
@@ -102,36 +102,9 @@ def plot_scatter(X, y, Xnames, yname):
     plt.legend()
     plt.show()
 
-######################################################################
-# data extraction functions
-######################################################################
-
-def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :        
-    """
-    Parameters
-    --------------------
-        x      -- list of lists where each sublist is a line from a csv file
-
-    Returns
-    --------------------
-        x      -- list of strings, length n (n comments)
-        y      -- list of ints, 1 = toxic, 0 = non-toxic, labels for x
-    """
-
-    x = []
-    y = []
-
-    for line in data: 
-        if any([int(line[predict_col]) == 1 for predict_col in predict_cols]):
-            y.append(1)
-        else: 
-            y.append(0)
-        x.append(line[comment_col])
-    return x,y
-
 def main(): 
     raw_data = load('../data/subsampled_train.csv')
-    x,y=extract(raw_data)
+    x,y=extract(raw_data) # x is list of comments, y is associated labels
 
 if __name__ == "__main__":
     main()
