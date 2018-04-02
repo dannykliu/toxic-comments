@@ -6,9 +6,7 @@ Authors: Sasha Friedrich
 Date:    4/1/18
 Description: Useful functions
 """
-
 import numpy as np
-
 import csv
 
 def load(infile):
@@ -20,9 +18,10 @@ def load(infile):
 
     with open(infile, 'rU') as fid:
         csvData = csv.reader(fid, delimiter=',')
-        data =[]
     
         for line in csvData:
-            data.append(line)
+            if index!=0:
+                data.append(line)
+            index+=1
 
-    return np.array(data)
+    return data

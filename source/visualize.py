@@ -106,44 +106,32 @@ def plot_scatter(X, y, Xnames, yname):
 # data extraction functions
 ######################################################################
 
-# def load(infile):
-#     """
-#     """
-#     index = 0
+def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :        
+    """
+    Parameters
+    --------------------
+        x      -- list of lists where each sublist is a line from a csv file
 
-#     data = []   # list of lists, where each sublist is a line of the csv file
+    Returns
+    --------------------
+        x      -- list of strings, length n (n comments)
+        y      -- list of ints, 1 = toxic, 0 = non-toxic, labels for x
+    """
 
-#     with open(infile, 'rU') as fid:
-#         csvData = csv.reader(fid, delimiter=',')
-#         data =[]
+    x = []
+    y = []
 
-#         for line in csvData:
-#             data.append(line)
-
-#     return np.array(data)
-
-# def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :        
-#     """
-
-#     Returns
-#     --------------------
-#         x      -- numpy array of shape (n,), feature values
-#         y      -- numpy array of shape (n,), target classes
-#         Xnames -- tuple of strings, names of features
-#         yname  -- string, name of target
-#     """
-
-#    if any([int(line[predict_col]) == 1 for predict_col in predict_cols]):
-#                     toxic_indices.append(index)
-#                 else: 
-#                     nontoxic_indices.append(index)
-#         for line in csvData:
-#             data.append(line)
-
+    for line in data: 
+        if any([int(line[predict_col]) == 1 for predict_col in predict_cols]):
+            y.append(1)
+        else: 
+            y.append(0)
+        x.append(line[comment_col])
+    return x,y
 
 def main(): 
-    data = load('../data/subsampled_train.csv')
-    print data.shape
+    raw_data = load('../data/subsampled_train.csv')
+    x,y=extract(raw_data)
 
 if __name__ == "__main__":
     main()
