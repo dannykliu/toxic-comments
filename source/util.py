@@ -93,7 +93,7 @@ def extract_words_nolower(input_string):
         input_string = input_string.replace(c, ' ' + c + ' ')
     return input_string.split()
 
-def create_and_write_dictionary(datafile):
+def create_and_write_dictionary(datafile, bagfile):
     """
     Create dictionary from all words in training data and write to text file
     """
@@ -109,7 +109,7 @@ def create_and_write_dictionary(datafile):
     for key in word_list:
         if word_list[key] > 2:
             new_word_list[key] = word_list[key]
-    with open('../data/bagfile.json', 'w') as f:
+    with open(bagfile, 'w') as f:
         f.write(json.dumps(new_word_list))
         f.close()
 
@@ -120,7 +120,7 @@ def get_data(infile):
     """
     raw_data = load(infile)
     comments, y = extract(raw_data)
-    word_list = json.load(open('../data/bagfile.json'))
+    word_list = json.load(open('../data/bagfile_subset.json'))
     print len(word_list)
     n, d = len(comments), len(word_list)
     X = np.zeros((n, d))

@@ -78,8 +78,10 @@ def subsample_data(infile, outfile, n):
     write_data(outfile, data, header, toxic_indices, nontoxic_indices, n, n)
 
 
-subset_data('../data/train.csv', '../data/subset_data.csv')
-subsample_data('../data/train.csv', '../data/subsample_data.csv', 1000)
-subsample_data('../data/train.csv', '../data/features_data.csv', 1000)
-util.create_and_write_dictionary('../data/features_data.csv')
-util.create_and_write_dictionary('../data/features_data.csv')
+subset_data('../data/train.csv', '../data/subset.csv')
+subsample_data('../data/train.csv', '../data/subsample.csv', 1000)
+subsample_data('../data/train.csv', '../data/features_subsample.csv', 1000)
+subset_data('../data/train.csv', '../data/features_subset.csv')
+
+util.create_and_write_dictionary('../data/features_subsample.csv', '../data/bagfile_subsample.json')
+util.create_and_write_dictionary('../data/features_subset.csv', '../data/bagfile_subset.json')
