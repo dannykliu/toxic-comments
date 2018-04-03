@@ -110,7 +110,7 @@ def plot_scatter(X, y, Xnames, yname):
     plt.show()
 
 def countWords(X, testWords): 
-    """ counts the number of occurences of particular words
+    """ counts the number of occurrences of particular words
 
     Parameters
     -----------
