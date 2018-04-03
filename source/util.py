@@ -10,6 +10,7 @@ import numpy as np
 import csv
 from string import punctuation
 from collections import defaultdict
+import json
 
 
 def load(infile):
@@ -32,7 +33,7 @@ def load(infile):
     return data
 
 
-def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :        
+def extract(data, comment_col=1) :
     """
     Parameters
     --------------------
@@ -43,7 +44,7 @@ def extract(data, comment_col =1, predict_cols=[2,3,4,5,6,7]) :
         x      -- list of strings, length n (n comments)
         y      -- list of ints, 1 = toxic, 0 = non-toxic, labels for x
     """
-
+    predict_cols = [2, 3, 4, 5, 6, 7]
     x = []
     y = []
 
@@ -75,16 +76,25 @@ def extract_words(input_string):
     return input_string.lower().split()
 
 
-def extract_dictionary(comments):
+def create_and_write_dictionary(datafile):
     """
-    Create dictionary from all words in training data
+    Create dictionary from all words in training data and write to text file
     """
+    raw_data = load(datafile)
+    comments, y = extract(raw_data)
     word_list = defaultdict(int)
     for comment in comments:
         words = extract_words(comment)
         for word in words:
             word_list[word] += 1
-    return word_list
+    print len(word_list)
+    new_word_list = defaultdict(int)
+    for key in word_list:
+        if word_list[key] > 2:
+            new_word_list[key] = word_list[key]
+    with open('../data/bagfile.json', 'w') as f:
+        f.write(json.dumps(new_word_list))
+        f.close()
 
 
 def get_data(infile):
@@ -93,7 +103,8 @@ def get_data(infile):
     """
     raw_data = load(infile)
     comments, y = extract(raw_data)
-    word_list = extract_dictionary(comments)
+    word_list = json.load(open('../data/bagfile.json'))
+    print len(word_list)
     n, d = len(comments), len(word_list)
     X = np.zeros((n, d))
     for i in range(len(comments)):
@@ -102,3 +113,11 @@ def get_data(infile):
             if words[j] in word_list:
                 X[i, j] = 1
     return np.asarray(X), np.asarray(y)
+
+
+def main():
+    create_and_write_dictionary('../data/features_data.csv')
+
+
+if __name__ == '__main__':
+    main()

@@ -11,6 +11,7 @@ outputfile: 'subsampled_train.csv'
 # numpy libraries
 import numpy as np
 
+import util
 import csv
 
 
@@ -79,3 +80,6 @@ def subsample_data(infile, outfile, n):
 
 subset_data('../data/train.csv', '../data/subset_data.csv')
 subsample_data('../data/train.csv', '../data/subsample_data.csv', 1000)
+subsample_data('../data/train.csv', '../data/features_data.csv', 1000)
+util.create_and_write_dictionary('../data/features_data.csv')
+util.create_and_write_dictionary('../data/features_data.csv')
