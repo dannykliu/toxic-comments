@@ -102,6 +102,87 @@ def plot_scatter(X, y, Xnames, yname):
     plt.legend()
     plt.show()
 
+<<<<<<< Updated upstream
+=======
+def countWords(X, testWords): 
+    """ counts the number of occurrences of particular words
+
+    Parameters
+    -----------
+        X - list of comments (strings), length n
+
+    Returns
+    -------
+        y - list of counts of occurences of words, length n
+    """
+
+    y = []
+    for string in X: 
+        testWordCount = 0
+        words = extract_words(string)
+        for testWord in testWords: 
+            for word in words: 
+                if testWord == word: 
+                    testWordCount+=1
+        y.append(testWordCount)
+
+    return y
+
+def split_comments(X):
+    """
+    Parameters
+    --------------------
+        X       -- list of comments
+
+    Return 
+    --------------------
+        new_X   -- list of comments where each comment is a list of words
+    """
+    new_X = []
+    for comment in X:
+        new_X.append(extract_words_nolower(comment))
+    return new_X
+
+def visualize_capitalization(X, y):
+    """
+    Parameters
+    --------------------
+        X       -- list of comments (list of comments)
+        y       -- list of associated labels (toxic vs nontoxic)
+
+    Make a histogram of capitalization percentages for toxic vs nontoxic comments.
+
+    """
+    #capitalizaiton percentage
+    cap_per = []
+    for comment in X:
+        stripped_comment = comment.replace(" ", "")
+        cap_count = 0
+        uppers = [l for l in stripped_comment if l.isupper()]
+        percentage = 1.0*len(uppers)/len(stripped_comment)
+        cap_per.append(percentage)
+    
+    plot_histogram(cap_per, y, "Capitalization Percentage", "Toxicity")
+
+def visualize_comment_length(X, y):
+    """
+    Parameters
+    --------------------
+        X       -- list of comments (list of comments)
+        y       -- list of associated labels (toxic vs nontoxic)
+
+    Make a histogram of comment length for toxic vs nontoxic comments.
+
+    """
+    #comment length
+    comment_length = []
+    for comment in X:
+        comment_length.append(len(comment))
+
+    plot_histogram(comment_length, y, "Comment Length", "Toxicity")
+
+
+>>>>>>> Stashed changes
 def main(): 
     raw_data = load('../data/subsampled_train.csv')
     x,y=extract(raw_data) # x is list of comments, y is associated labels

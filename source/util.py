@@ -75,6 +75,23 @@ def extract_words(input_string):
         input_string = input_string.replace(c, ' ' + c + ' ')
     return input_string.lower().split()
 
+def extract_words_nolower(input_string):
+    """
+    Processes the input_string, separating it into "words" based on the presence
+    of spaces, and separating punctuation marks into their own words.
+
+    Parameters
+    --------------------
+        input_string -- string of characters
+
+    Returns
+    --------------------
+        words        -- list of lowercase "words"
+    """
+
+    for c in punctuation:
+        input_string = input_string.replace(c, ' ' + c + ' ')
+    return input_string.split()
 
 def create_and_write_dictionary(datafile):
     """
