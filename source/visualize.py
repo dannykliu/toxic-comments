@@ -187,18 +187,17 @@ def visualize_comment_length(X, y):
     plot_histogram(comment_length, y, "Comment Length", "Toxicity")
     
 def main(): 
-    raw_data = load('../data/subsample_data.csv')
+    raw_data = load('../data/features_subsample.csv')
     x,y=extract(raw_data) # x is list of comments, y is associated labels
 
-    # swear_words = ['shit', 'fuck', 'damn', 'bitch', 'crap', 'piss', 'ass', 'asshole', 'bastard']
+    swear_words = ['shit', 'fuck', 'damn', 'bitch', 'crap', 'piss', 'ass', 'asshole', 'bastard']
     # swear_counts = np.asarray(countWords(x, swear_words))
     # assert len(swear_counts) == len(y)
     # plot_histogram(swear_counts, np.asarray(y), 'number of swear words', 'toxicity', bins = [0, 1, 2, 3, 4, 5,6,7])
 
     sex_words = ['dick', 'suck', 'pussy', 'cunt', 'penis', 'balls', 'testicles', 'pubic', 'genitals', 'sex', 'fuck','sex']
-    sex_counts = np.asarray(countWords(x, sex_words))
-    assert len(sex_counts) == len(y)
-    plot_histogram(sex_counts, np.asarray(y), 'number of sex-related words', 'toxicity', bins = [0, 1, 2, 3, 4, 5,6,7])
+    counts = np.asarray(countWords(x, sex_words+swear_words))
+    plot_histogram(counts, np.asarray(y), 'number of swear/sex-related words', 'toxicity', bins = [0, 1, 2, 3, 4, 5,6,7])
 
 
 if __name__ == "__main__":
