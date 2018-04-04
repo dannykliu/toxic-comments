@@ -42,7 +42,9 @@ def performance(y_true, y_pred, metric="accuracy") :
         score = metrics.accuracy_score(y_true, y_label)
     if metric == "f1_score":
         score = metrics.f1_score(y_true, y_label)
-
+    print "&&&&&&&&&&&&&&&&&&&y_label: ", y_label
+    print "+++++++++++++++++++y_pred: ", y_pred
+    print "--------------------yTrue: ", y_true
     confusionMatrix = metrics.confusion_matrix(y_true, y_label)
 
     if metric == "auroc":
@@ -84,7 +86,8 @@ def cv_performance(clf, X, y, kf, metric="accuracy") :
         X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
         clf.fit(X_train, y_train)
         # use SVC.decision_function to make ``continuous-valued'' predictions
-        y_pred = clf.decision_function(X_test)
+        y_pred = clf.predict(X_test)
+        print "***************** metric: ", metric
         score = performance(y_test, y_pred, metric)
         if not np.isnan(score) :
             scores.append(score)
@@ -238,8 +241,8 @@ def main():
     #Find optimal hyperparameters
     scoreCGvalue = {}
     for metric in metric_list:
-        scoreCGvalue[metric] = list(select_param_rbf(X_trainS, y_trainS, skf, metric=metric))
-    print scoreCGvalue
+        scoreCGvalue[metric] = [metric, select_param_rbf(X_trainS, y_trainS, skf, metric=metric)]
+    print "C and Gamma values for PCA: ", scoreCGvalue
 
 
 
@@ -247,18 +250,18 @@ def main():
 
     ### Regular testing (without PCA)
     #Baseline training
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    baseline = DummyClassifier(strategy='most_frequent')
-    baseline.fit(X_train, y_train)
-    print "Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_test), y_test)
-
-    skf = StratifiedKFold(n_splits=5)
-    metric_list = ["accuracy", "f1_score", "auroc", "precision", "sensitivity", "specificity"]
-    #Find optimal hyperparameters
-    scoreCGvalue = {}
-    for metric in metric_list:
-        scoreCGvalue[metric] = list(select_param_rbf(X_train, y_train, skf, metric=metric))
-    print scoreCGvalue
+    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    # baseline = DummyClassifier(strategy='most_frequent')
+    # baseline.fit(X_train, y_train)
+    # print "Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_test), y_test)
+    #
+    # skf = StratifiedKFold(n_splits=5)
+    # metric_list = ["accuracy", "f1_score", "auroc", "precision", "sensitivity", "specificity"]
+    # #Find optimal hyperparameters
+    # scoreCGvalue = {}
+    # for metric in metric_list:
+    #     scoreCGvalue[metric] = list(select_param_rbf(X_train, y_train, skf, metric=metric))
+    # print "C and Gamma Values: ", scoreCGvalue
 
 
     #SVM training
