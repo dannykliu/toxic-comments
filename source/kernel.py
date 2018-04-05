@@ -35,16 +35,15 @@ def performance(y_true, y_pred, metric="accuracy") :
         score  -- float, performance score
     """
     # map continuous-valued predictions to binary labels
-    y_label = np.sign(y_pred)
-    y_label[y_label==0] = 1 # map points of hyperplane to +1
-
+    #y_label = np.sign(y_pred)
+    y_label = y_pred # map points of hyperplane to +1
     if metric == "accuracy":
         score = metrics.accuracy_score(y_true, y_label)
     if metric == "f1_score":
         score = metrics.f1_score(y_true, y_label)
-    print "&&&&&&&&&&&&&&&&&&&y_label: ", y_label
-    print "+++++++++++++++++++y_pred: ", y_pred
-    print "--------------------yTrue: ", y_true
+
+    # print "Y_True: ", y_true
+    # print "y_pred: ", y_label
     confusionMatrix = metrics.confusion_matrix(y_true, y_label)
 
     if metric == "auroc":
@@ -87,7 +86,6 @@ def cv_performance(clf, X, y, kf, metric="accuracy") :
         clf.fit(X_train, y_train)
         # use SVC.decision_function to make ``continuous-valued'' predictions
         y_pred = clf.predict(X_test)
-        print "***************** metric: ", metric
         score = performance(y_test, y_pred, metric)
         if not np.isnan(score) :
             scores.append(score)
@@ -225,25 +223,43 @@ def applyPCA(X, l):
 
 def main():
     #Get our data
-    X, y = util.get_data('../data/subset_data.csv')
+    X, y = util.get_data('../data/subsample_data.csv')
     print "Shapes are: ", X.shape, y.shape
 
     X_small = applyPCA(X, 500)
-
+    metric_list = ["accuracy", "f1_score", "precision", "sensitivity", "specificity"]
     #Using PCA:
     X_trainS, X_testS, y_trainS, y_testS = train_test_split(X_small, y, test_size=0.2)
     baseline = DummyClassifier(strategy='most_frequent')
     baseline.fit(X_trainS, y_trainS)
     print "Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_testS), y_testS)
+    # linear_svm = SVC(kernel='linear', C=1.0)
+    # linear_svm.fit(X_trainS, y_trainS)
+    #
+    # for metricNDX in range(len(metric_list)):
+    #     print "METRIC IS: ", metric_list[metricNDX]
+    #     if metric_list[metricNDX] == "auroc":
+    #         print "Omitting Baseline due to metric"
+    #         print "Omitting SVM due to metric"
+    #         #print "SVM Performance is: ", performance(y_testS, linear_svm.decision_function(X_testS), metric=metric_list[metricNDX])
+    #     print "Baseline Performance: ", performance(y_testS, baseline.predict(X_testS), metric=metric_list[metricNDX])
+    #     print "SVM Performance is: ", performance(y_testS, linear_svm.predict(X_testS),metric=metric_list[metricNDX])
 
     skf = StratifiedKFold(n_splits=5)
-    metric_list = ["accuracy", "f1_score", "auroc", "precision", "sensitivity", "specificity"]
+
     #Find optimal hyperparameters
     scoreCGvalue = {}
     for metric in metric_list:
-        scoreCGvalue[metric] = [metric, select_param_rbf(X_trainS, y_trainS, skf, metric=metric)]
+        scoreCGvalue[metric] = list(select_param_rbf(X_trainS, y_trainS, skf, metric=metric))
     print "C and Gamma values for PCA: ", scoreCGvalue
-
+    for metricNDX in range(len(metric_list)):
+        C, gamma = scoreCGvalue[metric_list[metricNDX]]
+        print "Training with C: ", C, "and gamma: ", gamma
+        svmRBF = SVC(kernel='rbf', C=C, gamma=gamma)
+        svmRBF.fit(X_trainS, y_trainS)
+        print "METRIC IS: ", metric_list[metricNDX]
+        print "Baseline Performance: ", performance(y_testS, baseline.predict(X_testS), metric=metric_list[metricNDX])
+        print "SVM Performance is: ", performance(y_testS, svmRBF.predict(X_testS), metric=metric_list[metricNDX])
 
 
 
