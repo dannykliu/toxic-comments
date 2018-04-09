@@ -87,11 +87,12 @@ def create_and_write_dictionary(datafile, bagfile):
         words = extract_words(comment)
         for word in words:
             word_list[word] += 1
-    print len(word_list)
     new_word_list = defaultdict(int)
+    print len(word_list)
     for key in word_list:
-        if word_list[key] > 2:
+        if word_list[key] > 20:
             new_word_list[key] = word_list[key]
+    print len(new_word_list)
     with open(bagfile, 'w') as f:
         f.write(json.dumps(new_word_list))
         f.close()
@@ -103,8 +104,7 @@ def get_data(infile):
     """
     raw_data = load(infile)
     comments, y = extract(raw_data)
-    word_list = json.load(open('../data/bagfile_subset.json'))
-    print len(word_list)
+    word_list = json.load(open('../data/bagfile_subsample.json'))
     n, d = len(comments), len(word_list)
     X = np.zeros((n, d))
     for i in range(len(comments)):
@@ -116,7 +116,7 @@ def get_data(infile):
 
 
 def main():
-    create_and_write_dictionary('../data/features_data.csv')
+    pass
 
 
 if __name__ == '__main__':

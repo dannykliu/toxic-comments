@@ -66,7 +66,8 @@ def subset_data(infile, outfile):
     ratio = 0.02
     num_toxic = int(ratio * len(toxic_indices))
     num_nontoxic = int(ratio * len(nontoxic_indices))
-    print num_toxic, num_nontoxic
+    print "num toxic", num_toxic
+    print "num nontoxic", num_nontoxic
     write_data(outfile, data, header, toxic_indices, nontoxic_indices, num_toxic, num_nontoxic)
 
 
@@ -79,9 +80,9 @@ def subsample_data(infile, outfile, n):
 
 
 subset_data('../data/train.csv', '../data/subset.csv')
-subsample_data('../data/train.csv', '../data/subsample.csv', 1000)
-subsample_data('../data/train.csv', '../data/features_subsample.csv', 1000)
-subset_data('../data/train.csv', '../data/features_subset.csv')
+# subsample_data('../data/train.csv', '../data/subsample.csv', 1000)
+# subsample_data('../data/train.csv', '../data/features_subsample.csv', 16000)
+# subset_data('../data/train.csv', '../data/features_subset.csv')
 
-util.create_and_write_dictionary('../data/features_subsample.csv', '../data/bagfile_subsample.json')
-util.create_and_write_dictionary('../data/features_subset.csv', '../data/bagfile_subset.json')
+# util.create_and_write_dictionary('../data/features_subsample.csv', '../data/bagfile_subsample.json')
+# util.create_and_write_dictionary('../data/train.csv', '../data/bagfile_subset.json')
