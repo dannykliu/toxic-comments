@@ -10,7 +10,7 @@ import nltk
 def main():
     #Get our data
     X, y = util.get_data('../data/subset_data.csv')
-    print "Shapes are: ", X.shape, y.shape
+    print ("Shapes are: ", X.shape, y.shape)
 
     metric_list = ["accuracy", "f1_score", "precision", "sensitivity", "specificity"]
     #Using PCA:
@@ -18,7 +18,7 @@ def main():
     baseline = DummyClassifier(strategy='uniform')
     baseline.fit(X_train, y_train)
 
-    print "Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_testS), y_testS)
+    print ("Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_testS), y_testS))
     # linear_svm = SVC(kernel='linear', C=1.0)
     # linear_svm.fit(X_trainS, y_trainS)
     #
