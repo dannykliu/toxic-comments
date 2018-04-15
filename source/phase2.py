@@ -9,7 +9,7 @@ import nltk
 
 def main():
     #Get our data
-    X, y = util.get_data('../data/subset_data.csv')
+    X, y = util.get_data('../data/subset.csv')
     print ("Shapes are: ", X.shape, y.shape)
 
     metric_list = ["accuracy", "f1_score", "precision", "sensitivity", "specificity"]
