@@ -40,7 +40,7 @@ def main():
     for metric in metric_list:
         skf = StratifiedKFold(n_splits=5)
         scoreCGvalue[metric] = \
-        list(select_param_rbf(X_train, y_train, skf metric=metric, class_weight='balanced'))
+        list(select_param_rbf(X_train, y_train, skf, metric=metric, class_weight='balanced'))
     print ("C and Gamma values Training: ", scoreCGvalue)
 
     #Lets go through the metrics again? This is efficient.
