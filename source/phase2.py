@@ -4,7 +4,7 @@
 
 
 from kernel import *
-
+import nltk
 
 
 def main():

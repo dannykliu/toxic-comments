@@ -91,7 +91,7 @@ def cv_performance(clf, X, y, kf, metric="accuracy") :
             scores.append(score)
     return np.array(scores).mean()
 
-def select_param_rbf(X, y, kf, metric="accuracy") :
+def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
     """
     From Project 6 (Dalton's code)
     Sweeps different settings for the hyperparameters of an RBF-kernel SVM,
@@ -128,7 +128,7 @@ def select_param_rbf(X, y, kf, metric="accuracy") :
         gIndex = 0
         for gamma in gamma_range:
             #make the svm
-            svm = SVC(kernel="rbf", C=c, gamma=gamma)
+            svm = SVC(kernel="rbf", C=c, gamma=gamma, class_weight = class_weight)
             accuracy = cv_performance(svm, X, y, kf, metric)
 
             #Place it in the grid
