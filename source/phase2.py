@@ -5,7 +5,14 @@
 
 from kernel import *
 import nltk
+import multiprocessing as mp
 
+
+def train(inputList):
+    [X_train, y_train, metric] = inputList
+    skf = StratifiedKFold(n_splits=5)
+    metric= list(select_param_rbf(X_train, y_train, skf, metric=metric, class_weight='balanced'))
+    return metric
 
 def main():
     #Get our data
@@ -33,16 +40,21 @@ def main():
 
 
     #Make our splits
-
+    inputs = []
+    for metric in metric_list:
+        input = [X_train, y_train, metric]
+        inputs.append(input)
     # Starting RBF Params: Find optimal hyperparameters
     scoreCGvalue = {}
     # Loop through metrics to find optimal C and gamma values for each specific metric
-    for metric in metric_list:
-        skf = StratifiedKFold(n_splits=5)
-        scoreCGvalue[metric] = \
-        list(select_param_rbf(X_train, y_train, skf, metric=metric, class_weight='balanced'))
+    pool = mp.Pool(5)
+    outputs = pool.map(train, inputs)
+
+    print outputs
+    print ("THESE ARE THE OUTPUTS: ", outputs)
     print ("C and Gamma values Training: ", scoreCGvalue)
 
+    scoreCGvalue = outputs
     #Lets go through the metrics again? This is efficient.
     for metricNDX in range(len(metric_list)):
 
