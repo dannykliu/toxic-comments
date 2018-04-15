@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import util
 import numpy as np
 
@@ -15,19 +17,25 @@ import time
 def main():
     # train on subsampled data, test on subset of data
     X, y = util.get_data('../data/subset.csv')
-    print X.shape, y.shape
-
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    baseline = DummyClassifier(strategy='most_frequent')
-    baseline.fit(X, y)
-    print metrics.accuracy_score(baseline.predict(X_test), y_test)
+    print(X.shape, y.shape)
+
+    baseline = DummyClassifier(strategy='uniform')
+    baseline.fit(X_train, y_train)
+    y_pred = baseline.predict(X_test)
+    print("baseline accuracy ", metrics.accuracy_score(y_true=y_test, y_pred=y_pred))
+    print("baseline precision ", metrics.precision_score(y_true=y_test, y_pred=y_pred))
+    print("baseline recall ", metrics.recall_score(y_true=y_test, y_pred=y_pred))
 
     t1 = time.time()
     linear_svm = SVC(kernel='linear', C=1.0)
-    linear_svm.fit(X, y)
+    linear_svm.fit(X_train, y_train)
+    print('training took ' + str(time.time() - t1) + ' seconds')
 
-    print 'training took ' + str(time.time() - t1) + ' seconds'
-    print metrics.accuracy_score(linear_svm.predict(X_test), y_test)
+    y_pred = linear_svm.predict(X_test)
+    print("linear svm accuracy ", metrics.accuracy_score(y_true=y_test, y_pred=y_pred))
+    print("linear svm precision ", metrics.precision_score(y_true=y_test, y_pred=y_pred))
+    print("linear recall ", metrics.recall_score(y_true=y_test, y_pred=y_pred))
 
 
 if __name__ == '__main__':

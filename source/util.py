@@ -121,14 +121,18 @@ def get_data(infile):
     raw_data = load(infile)
     comments, y = extract(raw_data)
     word_list = json.load(open('../data/bagfile_subset.json'))
-    print len(word_list)
+    word_to_index = {}
+    i = 0
+    for word in word_list:
+        word_to_index[word] = i
+        i += 1
     n, d = len(comments), len(word_list)
     X = np.zeros((n, d))
     for i in range(len(comments)):
         words = extract_words(comments[i])
         for j in range(len(words)):
             if words[j] in word_list:
-                X[i, j] = 1
+                X[i, word_to_index[words[j]]] = 1
     return np.asarray(X), np.asarray(y)
 
 
