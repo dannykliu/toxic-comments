@@ -41,22 +41,22 @@ def main():
         skf = StratifiedKFold(n_splits=5)
         scoreCGvalue[metric] = \
         list(select_param_rbf(X_train, y_train, skf metric=metric, class_weight='balanced'))
-    print "C and Gamma values Training: ", scoreCGvalue
+    print ("C and Gamma values Training: ", scoreCGvalue)
 
     #Lets go through the metrics again? This is efficient.
     for metricNDX in range(len(metric_list)):
 
         C, gamma = scoreCGvalue[metric_list[metricNDX]]
-        print "Training with C: ", C, "and gamma: ", gamma
+        print ("Training with C: ", C, "and gamma: ", gamma)
 
         #Train a model with its optimal c and gamma values (Currently only RBF)
         svmRBF = SVC(kernel='rbf', C=C, gamma=gamma, class_weight= 'balanced')
         svmRBF.fit(X_train, y_train)
 
         #Let's see how we did!
-        print "METRIC IS: ", metric_list[metricNDX]
-        print "Baseline Performance: ", performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX])
-        print "SVM Performance is: ", performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX])
+        print ("METRIC IS: ", metric_list[metricNDX])
+        print ("Baseline Performance: ", performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))
+        print ("SVM Performance is: ", performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX]))
 
 
 
