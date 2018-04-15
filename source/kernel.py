@@ -224,7 +224,7 @@ def applyPCA(X, l):
 def main():
     #Get our data
     X, y = util.get_data('../data/subsample_data.csv')
-    print ( "Shapes are: ", X.shape, y.shape))
+    print ( "Shapes are: ", X.shape, y.shape)
 
 
     # We apply PCA and then train a dummy classifier
