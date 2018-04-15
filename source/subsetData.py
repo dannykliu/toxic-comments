@@ -79,9 +79,7 @@ def subsample_data(infile, outfile, n):
 
 
 subset_data('../data/train.csv', '../data/subset.csv')
-subsample_data('../data/train.csv', '../data/subsample.csv', 1000)
-subsample_data('../data/train.csv', '../data/features_subsample.csv', 1000)
-subset_data('../data/train.csv', '../data/features_subset.csv')
+util.create_and_write_dictionary('../data/subset.csv', '../data/bagfile_subset.json')
 
-util.create_and_write_dictionary('../data/features_subsample.csv', '../data/bagfile_subsample.json')
-util.create_and_write_dictionary('../data/features_subset.csv', '../data/bagfile_subset.json')
+# subsample_data('../data/train.csv', '../data/subsample.csv', 2000)
+# util.create_and_write_dictionary('../data/subsample.csv', '../data/bagfile_subsample.json')

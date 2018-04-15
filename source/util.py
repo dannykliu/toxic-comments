@@ -11,7 +11,7 @@ import csv
 from string import punctuation
 from collections import defaultdict
 import json
-
+import re
 
 def load(infile):
     """
@@ -33,7 +33,7 @@ def load(infile):
     return data
 
 
-def extract(data, comment_col=1) :
+def extract(data) :
     """
     Parameters
     --------------------
@@ -44,16 +44,17 @@ def extract(data, comment_col=1) :
         x      -- list of strings, length n (n comments)
         y      -- list of ints, 1 = toxic, 0 = non-toxic, labels for x
     """
+    comment_col = 1
     predict_cols = [2, 3, 4, 5, 6, 7]
     x = []
     y = []
 
-    for line in data: 
+    for line in data:
         if any([int(line[predict_col]) == 1 for predict_col in predict_cols]):
             y.append(1)
         else: 
             y.append(0)
-        x.append(line[comment_col])
+        x.append(clean_text(line[comment_col]))
     return x, y
 
 
@@ -75,6 +76,7 @@ def extract_words(input_string):
         input_string = input_string.replace(c, ' ' + c + ' ')
     return input_string.lower().split()
 
+
 def extract_words_nolower(input_string):
     """
     Processes the input_string, separating it into "words" based on the presence
@@ -93,6 +95,24 @@ def extract_words_nolower(input_string):
         input_string = input_string.replace(c, ' ' + c + ' ')
     return input_string.split()
 
+
+def clean_text(text):
+    text = re.sub(r"what's", "what is ", text)
+    text = re.sub(r"\'s", " ", text)
+    text = re.sub(r"\'ve", " have ", text)
+    text = re.sub(r"can't", "cannot ", text)
+    text = re.sub(r"n't", " not ", text)
+    text = re.sub(r"i'm", "i am ", text)
+    text = re.sub(r"\'re", " are ", text)
+    text = re.sub(r"\'d", " would ", text)
+    text = re.sub(r"\'ll", " will ", text)
+    text = re.sub(r"\'scuse", " excuse ", text)
+    text = re.sub('\W', ' ', text)
+    text = re.sub('\s+', ' ', text)
+    text = text.strip(' ')
+    return text
+
+
 def create_and_write_dictionary(datafile, bagfile):
     """
     Create dictionary from all words in training data and write to text file
@@ -101,7 +121,7 @@ def create_and_write_dictionary(datafile, bagfile):
     comments, y = extract(raw_data)
     word_list = defaultdict(int)
     for comment in comments:
-        words = extract_words(comment)
+        words = extract_words(clean_text(comment))
         for word in words:
             word_list[word] += 1
     print len(word_list)
@@ -137,7 +157,7 @@ def get_data(infile):
 
 
 def main():
-    create_and_write_dictionary('../data/features_data.csv')
+    pass
 
 
 if __name__ == '__main__':
