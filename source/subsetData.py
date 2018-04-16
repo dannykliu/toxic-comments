@@ -60,10 +60,10 @@ def write_data(outfile, data, header, toxic_indices, nontoxic_indices, num_toxic
 
 def subset_data(infile, outfile):
     """
-    Create subset of 2% of original dataset, with same class proportions as original dataset
+    Create subset of 20% of original dataset, with same class proportions as original dataset
     """
     data, header, toxic_indices, nontoxic_indices = get_indices(infile)
-    ratio = 0.02
+    ratio = 0.15
     num_toxic = int(ratio * len(toxic_indices))
     num_nontoxic = int(ratio * len(nontoxic_indices))
     print num_toxic, num_nontoxic
@@ -79,7 +79,7 @@ def subsample_data(infile, outfile, n):
 
 
 subset_data('../data/train.csv', '../data/subset.csv')
-util.create_and_write_dictionary('../data/subset.csv', '../data/bagfile_subset.json')
+# util.create_and_write_dictionary('../data/subset.csv', '../data/bagfile_subset.json')
 
 # subsample_data('../data/train.csv', '../data/subsample.csv', 2000)
 # util.create_and_write_dictionary('../data/subsample.csv', '../data/bagfile_subsample.json')

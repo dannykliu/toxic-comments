@@ -13,6 +13,7 @@ from collections import defaultdict
 import json
 import re
 
+
 def load(infile):
     """
         extract toxic comment data from csv file
@@ -132,6 +133,12 @@ def create_and_write_dictionary(datafile, bagfile):
     with open(bagfile, 'w') as f:
         f.write(json.dumps(new_word_list))
         f.close()
+
+
+def get_data2(infile):
+    raw_data = load(infile)
+    comments, y = extract(raw_data)
+    return np.asarray(comments), np.asarray(y)
 
 
 def get_data(infile):
