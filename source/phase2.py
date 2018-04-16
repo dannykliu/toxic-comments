@@ -22,6 +22,7 @@ def main():
     X, y = util.get_data2('../data/subset.csv')
     file.write("Shapes are: "+ str(X.shape)+ str(y.shape))
 
+
     vect = TfidfVectorizer(max_features=5000, min_df=2)
     X_dtm = vect.fit_transform(X)
     print(X_dtm.shape, y.shape)
@@ -34,7 +35,7 @@ def main():
     baseline.fit(X_train, y_train)
 
     file.write ("Baseline Metrics: "+ str(metrics.accuracy_score(baseline.predict(X_test), y_test))+"\n")
-
+    file.flush()
     #Make our splits
     inputs = []
     for metric in metric_list:
