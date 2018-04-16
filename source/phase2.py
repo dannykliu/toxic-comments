@@ -6,6 +6,7 @@
 from kernel import *
 import nltk
 import multiprocessing as mp
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def train(inputList):
@@ -16,28 +17,23 @@ def train(inputList):
 
 def main():
     #Get our data
-    X, y = util.get_data('../data/subset.csv')
-    print ("Shapes are: ", X.shape, y.shape)
+    #USE GETDATA2 NOW
+    file = open("SVMRBFResults.txt", "w")
+    X, y = util.get_data2('../data/subset.csv')
+    file.write("Shapes are: "+ str(X.shape)+ str(y.shape))
+
+    vect = TfidfVectorizer(max_features=5000, min_df=2)
+    X_dtm = vect.fit_transform(X)
+    print(X_dtm.shape, y.shape)
 
     metric_list = ["accuracy", "f1_score", "precision", "sensitivity", "specificity"]
-    #Using PCA:
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    # still need to add in tf-idf implementation
+    X_train, X_test, y_train, y_test = train_test_split(X_dtm, y, test_size=0.2)
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     baseline = DummyClassifier(strategy='uniform')
     baseline.fit(X_train, y_train)
 
-    print ("Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_test), y_test))
-    # linear_svm = SVC(kernel='linear', C=1.0)
-    # linear_svm.fit(X_trainS, y_trainS)
-    #
-    # for metricNDX in range(len(metric_list)):
-    #     print "METRIC IS: ", metric_list[metricNDX]
-    #     if metric_list[metricNDX] == "auroc":
-    #         print "Omitting Baseline due to metric"
-    #         print "Omitting SVM due to metric"
-    #         #print "SVM Performance is: ", performance(y_testS, linear_svm.decision_function(X_testS), metric=metric_list[metricNDX])
-    #     print "Baseline Performance: ", performance(y_testS, baseline.predict(X_testS), metric=metric_list[metricNDX])
-    #     print "SVM Performance is: ", performance(y_testS, linear_svm.predict(X_testS),metric=metric_list[metricNDX])
-
+    file.write ("Baseline Metrics: "+ str(metrics.accuracy_score(baseline.predict(X_test), y_test))+"\n")
 
     #Make our splits
     inputs = []
@@ -50,52 +46,26 @@ def main():
     pool = mp.Pool(5)
     outputs = pool.map(train, inputs)
 
-    print outputs
-    print ("THESE ARE THE OUTPUTS: ", outputs)
-    print ("C and Gamma values Training: ", scoreCGvalue)
+    file.write ("THESE ARE THE OUTPUTS: "+ str(outputs)+"\n")
+    file.write ("C and Gamma values Training: "+ str(scoreCGvalue)+"\n")
 
     scoreCGvalue = outputs
     #Lets go through the metrics again? This is efficient.
     for metricNDX in range(len(metric_list)):
 
         C, gamma = scoreCGvalue[metric_list[metricNDX]]
-        print ("Training with C: ", C, "and gamma: ", gamma)
+        file.write ("Training with C: "+ C+ "and gamma: "+ gamma +"\n")
 
         #Train a model with its optimal c and gamma values (Currently only RBF)
         svmRBF = SVC(kernel='rbf', C=C, gamma=gamma, class_weight= 'balanced')
         svmRBF.fit(X_train, y_train)
 
         #Let's see how we did!
-        print ("METRIC IS: ", metric_list[metricNDX])
-        print ("Baseline Performance: ", performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))
-        print ("SVM Performance is: ", performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX]))
+        file.write ("METRIC IS: "+ str(metric_list[metricNDX])+"\n")
+        file.write ("Baseline Performance: "+ str(performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))+"\n")
+        file.write ("SVM Performance is: "+ str(performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX])) +"\n")
 
-
-
-
-    ### Regular testing (without PCA)
-    #Baseline training
-    # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    # baseline = DummyClassifier(strategy='most_frequent')
-    # baseline.fit(X_train, y_train)
-    # print "Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_test), y_test)
-    #
-    # skf = StratifiedKFold(n_splits=5)
-    # metric_list = ["accuracy", "f1_score", "auroc", "precision", "sensitivity", "specificity"]
-    # #Find optimal hyperparameters
-    # scoreCGvalue = {}
-    # for metric in metric_list:
-    #     scoreCGvalue[metric] = list(select_param_rbf(X_train, y_train, skf, metric=metric))
-    # print "C and Gamma Values: ", scoreCGvalue
-
-
-    #SVM training
-    # svmRBF = SVC(kernel='rbf', C=1.0)
-    # linear_svm.fit(X_train, y_train)
-    # print 'done training'
-    # print metrics.accuracy_score(linear_svm.predict(X_test), y_test)
-    # print np.equal(linear_svm.predict(X_test), baseline.predict(X_test))
-
+    file.close()
 
 if __name__ == '__main__':
     main()
