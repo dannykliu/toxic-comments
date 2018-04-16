@@ -121,7 +121,7 @@ def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
     for index in range(len(gamma_range)):
         gamma_range[index] = 2.0 ** gamma_range[index]
     for cIndex in range(len(C_range)):
-        gamma_range[cIndex] = 2.0 ** gamma_range[cIndex]
+        C_range[cIndex] = 2.0 ** C_range[cIndex]
 
     #create the grid
     mgrid = np.mgrid[0:15.0, 0:15.0]
