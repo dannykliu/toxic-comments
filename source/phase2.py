@@ -65,6 +65,7 @@ def main():
         file.write ("METRIC IS: "+ str(metric_list[metricNDX])+"\n")
         file.write ("Baseline Performance: "+ str(performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))+"\n")
         file.write ("SVM Performance is: "+ str(performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX])) +"\n")
+        file.flush()
 
     file.close()
 
