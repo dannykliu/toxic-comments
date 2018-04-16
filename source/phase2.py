@@ -6,6 +6,7 @@
 from kernel import *
 import nltk
 import multiprocessing as mp
+from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def train(inputList):
@@ -18,21 +19,21 @@ def main():
     #Get our data
     #USE GETDATA2 NOW
     file = open("SVMRBFResults.txt", "w")
-    X, y = util.get_data('../data/subset.csv')
-    print ("Shapes are: ", X.shape, y.shape)
+    X, y = util.get_data2('../data/subset.csv')
+    file.write("Shapes are: "+ str(X.shape)+ str(y.shape))
 
-    # vect = TfidfVectorizer(max_features=2000, min_df=2)
-    # X_dtm = vect.fit_transform(X)
+    vect = TfidfVectorizer(max_features=5000, min_df=2)
+    X_dtm = vect.fit_transform(X)
     print(X_dtm.shape, y.shape)
 
     metric_list = ["accuracy", "f1_score", "precision", "sensitivity", "specificity"]
     # still need to add in tf-idf implementation
-    #X_train, X_test, y_train, y_test = train_test_split(X_dtm, y, test_size=0.2)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X_dtm, y, test_size=0.2)
+    #X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
     baseline = DummyClassifier(strategy='uniform')
     baseline.fit(X_train, y_train)
 
-    file.write ("Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_test), y_test))
+    file.write ("Baseline Metrics: "+ str(metrics.accuracy_score(baseline.predict(X_test), y_test))+"\n")
 
     #Make our splits
     inputs = []
@@ -45,25 +46,24 @@ def main():
     pool = mp.Pool(5)
     outputs = pool.map(train, inputs)
 
-    file.write outputs
-    file.write ("THESE ARE THE OUTPUTS: ", outputs)
-    file.write ("C and Gamma values Training: ", scoreCGvalue)
+    file.write ("THESE ARE THE OUTPUTS: "+ str(outputs)+"\n")
+    file.write ("C and Gamma values Training: "+ str(scoreCGvalue)+"\n")
 
     scoreCGvalue = outputs
     #Lets go through the metrics again? This is efficient.
     for metricNDX in range(len(metric_list)):
 
         C, gamma = scoreCGvalue[metric_list[metricNDX]]
-        file.write ("Training with C: ", C, "and gamma: ", gamma)
+        file.write ("Training with C: "+ C+ "and gamma: "+ gamma +"\n")
 
         #Train a model with its optimal c and gamma values (Currently only RBF)
         svmRBF = SVC(kernel='rbf', C=C, gamma=gamma, class_weight= 'balanced')
         svmRBF.fit(X_train, y_train)
 
         #Let's see how we did!
-        file.write ("METRIC IS: ", metric_list[metricNDX])
-        file.write ("Baseline Performance: ", performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))
-        file.write ("SVM Performance is: ", performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX]))
+        file.write ("METRIC IS: "+ str(metric_list[metricNDX])+"\n")
+        file.write ("Baseline Performance: "+ str(performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))+"\n")
+        file.write ("SVM Performance is: "+ str(performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX])) +"\n")
 
     file.close()
 
