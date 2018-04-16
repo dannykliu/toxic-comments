@@ -37,20 +37,20 @@ def main():
     file.write ("Baseline Metrics: "+ str(metrics.accuracy_score(baseline.predict(X_test), y_test))+"\n")
     file.flush()
     #Make our splits
-    inputs = []
-    for metric in metric_list:
-        input = [X_train, y_train, metric]
-        inputs.append(input)
-    # Starting RBF Params: Find optimal hyperparameters
+
     scoreCGvalue = {}
+    for metric in metric_list:
+        skf = StratifiedKFold(n_splits=5)
+        scoreCGvalue[metric] = \
+        list(select_param_rbf(X_train, y_train, skf, metric=metric, class_weight='balanced'))
+    # Starting RBF Params: Find optimal hyperparameters
+
     # Loop through metrics to find optimal C and gamma values for each specific metric
-    pool = mp.Pool(5)
-    outputs = pool.map(train, inputs)
+
 
     file.write ("THESE ARE THE OUTPUTS: "+ str(outputs)+"\n")
     file.write ("C and Gamma values Training: "+ str(scoreCGvalue)+"\n")
 
-    scoreCGvalue = outputs
     #Lets go through the metrics again? This is efficient.
     for metricNDX in range(len(metric_list)):
 
