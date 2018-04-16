@@ -115,8 +115,8 @@ def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
 
     print ( 'RBF SVM Hyperparameter Selection based on ',  str(metric), ':')
 
-    C_range = 2 ** np.arange(-5.0, 10, dtype=float)
-    gamma_range = 2 ** np.arange(-10.0, 5.0, dtype=float)
+    C_range = 2 ** range(-5.0, 10)
+    gamma_range = 2 ** range(-10.0, 5.0)
 
     #create the grid
     mgrid = np.mgrid[0:15.0, 0:15.0]
