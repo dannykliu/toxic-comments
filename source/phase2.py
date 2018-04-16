@@ -17,6 +17,7 @@ def train(inputList):
 def main():
     #Get our data
     #USE GETDATA2 NOW
+    file = open("SVMRBFResults.txt", "w")
     X, y = util.get_data('../data/subset.csv')
     print ("Shapes are: ", X.shape, y.shape)
 
@@ -31,7 +32,7 @@ def main():
     baseline = DummyClassifier(strategy='uniform')
     baseline.fit(X_train, y_train)
 
-    print ("Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_test), y_test))
+    file.write ("Baseline Metrics: ", metrics.accuracy_score(baseline.predict(X_test), y_test))
 
     #Make our splits
     inputs = []
@@ -44,26 +45,27 @@ def main():
     pool = mp.Pool(5)
     outputs = pool.map(train, inputs)
 
-    print outputs
-    print ("THESE ARE THE OUTPUTS: ", outputs)
-    print ("C and Gamma values Training: ", scoreCGvalue)
+    file.write outputs
+    file.write ("THESE ARE THE OUTPUTS: ", outputs)
+    file.write ("C and Gamma values Training: ", scoreCGvalue)
 
     scoreCGvalue = outputs
     #Lets go through the metrics again? This is efficient.
     for metricNDX in range(len(metric_list)):
 
         C, gamma = scoreCGvalue[metric_list[metricNDX]]
-        print ("Training with C: ", C, "and gamma: ", gamma)
+        file.write ("Training with C: ", C, "and gamma: ", gamma)
 
         #Train a model with its optimal c and gamma values (Currently only RBF)
         svmRBF = SVC(kernel='rbf', C=C, gamma=gamma, class_weight= 'balanced')
         svmRBF.fit(X_train, y_train)
 
         #Let's see how we did!
-        print ("METRIC IS: ", metric_list[metricNDX])
-        print ("Baseline Performance: ", performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))
-        print ("SVM Performance is: ", performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX]))
+        file.write ("METRIC IS: ", metric_list[metricNDX])
+        file.write ("Baseline Performance: ", performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))
+        file.write ("SVM Performance is: ", performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX]))
 
+    file.close()
 
 if __name__ == '__main__':
     main()
