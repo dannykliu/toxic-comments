@@ -8,7 +8,6 @@ import nltk
 import multiprocessing as mp
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-global metricDict
 
 def train(inputList):
     [X_train, y_train, metric] = inputList
@@ -17,6 +16,7 @@ def train(inputList):
     return metric
 
 def main():
+    global metricDict
     metricDict = {}
     #Get our data
     #USE GETDATA2 NOW
