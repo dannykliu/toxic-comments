@@ -57,7 +57,7 @@ def main():
     #Lets go through the metrics again? This is efficient.
     for metricNDX in range(len(metric_list)):
 
-        CGlist = scoreCGvalue[metric_list[metricNDX]]
+        CGlist = metricDict[metric_list[metricNDX]]
         C = CGList[0]
         gamma = CGList[1]
         file.write ("Training with C: "+ C+ "and gamma: "+ gamma +"\n")
