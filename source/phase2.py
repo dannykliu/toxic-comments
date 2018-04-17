@@ -23,7 +23,7 @@ def main():
     file.write("Shapes are: "+ str(X.shape)+ str(y.shape))
 
 
-    vect = TfidfVectorizer(max_features=5000, min_df=2)
+    vect = TfidfVectorizer(ngram_range=(1,2), max_features=2000, min_df=2)
     X_dtm = vect.fit_transform(X)
     print(X_dtm.shape, y.shape)
 
@@ -56,6 +56,12 @@ def main():
         metric = datum[1]
         C = datum[0][0]
         gamma = datum[0][1]
+        if metric == "sensitivity":
+            C = datum[0][0]
+            gamma = datum[0][1]
+        if metric == "f1_score":
+            C = datum[0][0]
+            gamma = datum[0][1]
         file.write ("Training with C: "+ str(C)+ "and gamma: "+ str(gamma) +"\n")
 
         #Train a model with its optimal c and gamma values (Currently only RBF)
