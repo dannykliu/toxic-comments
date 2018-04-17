@@ -8,17 +8,15 @@ import nltk
 import multiprocessing as mp
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-
+metricDict = {}
 def train(inputList):
-    global metricDict
     [X_train, y_train, metric] = inputList
     skf = StratifiedKFold(n_splits=5)
     metricDict[metric] = list(select_param_rbf(X_train, y_train, skf, metric=metric, class_weight='balanced'))
     return metric
 
 def main():
-    global metricDict
-    metricDict = {}
+
     #Get our data
     #USE GETDATA2 NOW
     file = open("SVMRBFResults.txt", "w")
