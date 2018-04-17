@@ -63,7 +63,7 @@ def main():
         svmRBF.fit(X_train, y_train)
 
         #Let's see how we did!
-        file.write ("METRIC IS: "+ str(metric_list[metricNDX])+"\n")
+        file.write ("METRIC IS: "+ str(metric)+"\n")
         file.write ("Baseline Performance: "+ str(performance(y_test, baseline.predict(X_test), metric=metric))+"\n")
         file.write ("SVM Performance is: "+ str(performance(y_test, svmRBF.predict(X_test), metric=metric)) +"\n")
         file.flush()
