@@ -10,6 +10,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 
 
 def train(inputList):
+    global metricDict
     [X_train, y_train, metric] = inputList
     skf = StratifiedKFold(n_splits=5)
     metricDict[metric] = list(select_param_rbf(X_train, y_train, skf, metric=metric, class_weight='balanced'))
