@@ -56,7 +56,7 @@ def main():
         metric = datum[1]
         C = datum[0][0]
         gamma = datum[0][1]
-        file.write ("Training with C: "+ C+ "and gamma: "+ gamma +"\n")
+        file.write ("Training with C: "+ str(C)+ "and gamma: "+ str(gamma) +"\n")
 
         #Train a model with its optimal c and gamma values (Currently only RBF)
         svmRBF = SVC(kernel='rbf', C=C, gamma=gamma, class_weight= 'balanced')
