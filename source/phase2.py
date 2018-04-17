@@ -8,12 +8,11 @@ import nltk
 import multiprocessing as mp
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-metricDict = {}
 def train(inputList):
     [X_train, y_train, metric] = inputList
     skf = StratifiedKFold(n_splits=5)
-    metricDict[metric] = list(select_param_rbf(X_train, y_train, skf, metric=metric, class_weight='balanced'))
-    return metric
+    cGamma = list(select_param_rbf(X_train, y_train, skf, metric=metric, class_weight='balanced'))
+    return [cGamma, metric]
 
 def main():
 
@@ -51,13 +50,12 @@ def main():
     file.write ("THESE ARE THE OUTPUTS: "+ str(outputs)+"\n")
     file.write ("C and Gamma values Training: "+ str(scoreCGvalue)+"\n")
 
-    scoreCGvalue = outputs
     #Lets go through the metrics again? This is efficient.
-    for metricNDX in range(len(metric_list)):
+    for datum in outputs:
 
-        CGlist = metricDict[metric_list[metricNDX]]
-        C = CGList[0]
-        gamma = CGList[1]
+        metric = datum[1]
+        C = datum[0][0]
+        gamma = datum[0][1]
         file.write ("Training with C: "+ C+ "and gamma: "+ gamma +"\n")
 
         #Train a model with its optimal c and gamma values (Currently only RBF)
@@ -66,8 +64,8 @@ def main():
 
         #Let's see how we did!
         file.write ("METRIC IS: "+ str(metric_list[metricNDX])+"\n")
-        file.write ("Baseline Performance: "+ str(performance(y_test, baseline.predict(X_test), metric=metric_list[metricNDX]))+"\n")
-        file.write ("SVM Performance is: "+ str(performance(y_test, svmRBF.predict(X_test), metric=metric_list[metricNDX])) +"\n")
+        file.write ("Baseline Performance: "+ str(performance(y_test, baseline.predict(X_test), metric=metric))+"\n")
+        file.write ("SVM Performance is: "+ str(performance(y_test, svmRBF.predict(X_test), metric=metric)) +"\n")
         file.flush()
 
     file.close()
