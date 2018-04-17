@@ -115,8 +115,8 @@ def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
 
     print ( 'RBF SVM Hyperparameter Selection based on ',  str(metric), ':')
 
-    C_range = range(-5, 10)
-    gamma_range = range(-10, 5)
+    C_range = 2 ** np.arange(-5.0, 10.0)
+    gamma_range = 2 ** np.arange(-10.0, 5.0)
 
     for index in range(len(gamma_range)):
         gamma_range[index] = 2.0 ** gamma_range[index]
@@ -152,8 +152,8 @@ def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
     #find the proper index and use that to figure out the gamma and c values used
     gIndex = np.argmax(gammaList)
     cIndex = cList[gIndex]
-    bestGamma = 2 ** (gIndex - 10)
-    bestC = 2 ** (cIndex - 5)
+    bestGamma = 2.0 ** (gIndex - 10.0)
+    bestC = 2.0 ** (cIndex - 5.0)
 
     return bestC, bestGamma
 
