@@ -2,7 +2,7 @@
 Author: Sasha Friedrich
 Date: 4/1/18
 Description: Reads in a csv file of toxic comments. Creates a subsampled data set that has an equal number of toxic and non-toxic comments.
-Non-toxic comments are sampled randomly without replacement. 
+Non-toxic comments are sampled randomly without replacement.
 Note that in the output file ALL non-toxic comments are before toxic comments
 outputfile: 'subsampled_train.csv'
 """
@@ -63,7 +63,7 @@ def subset_data(infile, outfile):
     Create subset of 20% of original dataset, with same class proportions as original dataset
     """
     data, header, toxic_indices, nontoxic_indices = get_indices(infile)
-    ratio = 0.15
+    ratio = 0.40
     num_toxic = int(ratio * len(toxic_indices))
     num_nontoxic = int(ratio * len(nontoxic_indices))
     print num_toxic, num_nontoxic
