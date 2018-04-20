@@ -115,8 +115,12 @@ def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
 
     print ( 'RBF SVM Hyperparameter Selection based on ',  str(metric), ':')
 
-    C_range = 2 ** np.arange(-5.0, 10.0)
-    gamma_range = 2 ** np.arange(-10.0, 5.0)
+    #C_range = 2 ** np.arange(-5.0, 10.0)
+    #gamma_range = 2 ** np.arange(-10.0, 5.0)
+
+    bestCGamma = {}
+    C_range = np.logspace(-2, 10, 13)
+    gamma_range = np.logspace(-9, 3, 13)
 
     for index in range(len(gamma_range)):
         gamma_range[index] = 2.0 ** gamma_range[index]
@@ -124,7 +128,7 @@ def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
         C_range[cIndex] = 2.0 ** C_range[cIndex]
 
     #create the grid
-    mgrid = np.mgrid[0:15.0, 0:15.0]
+    mgrid = np.mgrid[0:13.0, 0:13.0]
     grid = mgrid[0]
     cIndex = 0
 
@@ -134,10 +138,9 @@ def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
         for gamma in gamma_range:
             #make the svm
             svm = SVC(kernel="rbf", C=c, gamma=gamma, class_weight = class_weight)
-            accuracy = cv_performance(svm, X, y, kf, metric)
-
+            performance = cv_performance(svm, X, y, kf, metric)
             #Place it in the grid
-            grid[gIndex][cIndex] = accuracy
+            grid[gIndex][cIndex] = performance
             gIndex += 1
         cIndex += 1
 
@@ -152,8 +155,10 @@ def select_param_rbf(X, y, kf, metric="accuracy", class_weight= None) :
     #find the proper index and use that to figure out the gamma and c values used
     gIndex = np.argmax(gammaList)
     cIndex = cList[gIndex]
-    bestGamma = 2.0 ** (gIndex - 10.0)
-    bestC = 2.0 ** (cIndex - 5.0)
+    bestGamma = gamma_range[gIndex]
+    bestC = C_range[cIndex]
+
+    print("For: ", metric, " the best gamma: ", bestGamma, " and the best C: ", bestC)
 
     return bestC, bestGamma
 
