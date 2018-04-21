@@ -156,7 +156,7 @@ def get_data(infile):
     n, d = len(comments), len(word_list)
     X = np.zeros((n, d))
     for i in range(len(comments)):
-        words = extract_words(comments[i])
+        words = extract_words_nolower(comments[i])
         for j in range(len(words)):
             if words[j] in word_list:
                 X[i, word_to_index[words[j]]] = 1
@@ -177,6 +177,69 @@ def info_gain(Xj, y, threshold):
     cond_H = prob_less * H_less + (1-prob_less) * H_greater
     return entropy(y) - cond_H
 
+def get_cap_percentage(X, y):
+    """
+    Gets the capitalization percentage for each comment.
+    """
+    cap_per = []
+    for comment in X:
+        stripped_comment = comment.replace(" ", "")
+        cap_count = 0
+        uppers = [l for l in stripped_comment if l.isupper()]
+        percentage = 1.0*len(uppers)/len(stripped_comment)
+        cap_per.append(percentage)
+    np_cap = np.array(cap_per)
+    return np_cap
+
+def get_exclamation_percentage(X, y):
+    """
+    Gets the exclamation point percentage for each comment.
+    """
+    ex_per = []
+    for comment in X:
+        stripped_comment = comment.replace(" ", "")
+        ex_count = 0
+        excl = [l for l in stripped_comment if l=="!"]
+        percentage = 1.0*len(excl)/len(stripped_comment)
+        ex_per.append(percentage)
+    np_ex = np.array(ex_per)
+    return np_ex
+
+def countWords(X, testWords): 
+    """ counts the number of occurrences of particular words
+
+    Parameters
+    -----------
+        X - list of comments (strings), length n
+
+    Returns
+    -------
+        y - list of counts of occurences of words, length n
+    """
+
+    y = []
+    for string in X: 
+        testWordCount = 0
+        words = extract_words(string)
+        for testWord in testWords: 
+            for word in words: 
+                if testWord == word: 
+                    testWordCount+=1
+        y.append(testWordCount)
+    return y
+
+def bad_word_counts(X, y):
+    """
+    Gets the number of bad words in each comment (normalized)
+    """
+    swear_words = ['shit', 'fuck', 'damn', 'bitch', 'crap', 'piss', 'ass', 'asshole', 'bastard']
+    sex_words = ['dick', 'suck', 'pussy', 'cunt', 'penis', 'balls', 'testicles', 'pubic', 'genitals', 'sex', 'fuck','sex']
+    counts = np.asarray(countWords(X, sex_words+swear_words))
+    max_count = np.amax(counts)
+    normalized = []
+    for count in counts:
+        normalized.append(1.0*count/max_count)
+    return np.asarray(normalized)
 
 def main():
     pass

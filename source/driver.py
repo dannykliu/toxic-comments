@@ -20,6 +20,18 @@ import time
 def main():
     X, y = util.get_data2('../data/subset.csv')
 
+    #capitalization percentage
+    cap_per = util.get_cap_percentage(X, y)
+    #bad words
+    bad_words = util.bad_word_counts(X, y)
+    #exclamation point percentage
+    ex_per = util.get_exclamation_percentage(X, y)
+
+    new_features = cap_per
+    new_features = np.vstack((new_features, bad_words)).T
+    new_features = np.vstack((new_features, ex_per)).T
+    print(new_features.shape)
+
     # split on tfidf, then only select columns
     vect = TfidfVectorizer(max_features=None, min_df=2)
     X_dtm = vect.fit_transform(X)
@@ -48,6 +60,10 @@ def main():
     for f in num_features:
         max_cols = info_gains.argsort()[-f:][::-1]
         X = X_dtm[:, max_cols]
+
+        #add other features (capitalization percentage, bad words, exclamation points)
+        X = np.vstack((X, new_features)).T
+
         print("new shape", X.shape)
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
