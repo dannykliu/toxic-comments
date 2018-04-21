@@ -163,6 +163,21 @@ def get_data(infile):
     return np.asarray(X), np.asarray(y)
 
 
+def entropy(y):
+    probs = [np.mean(y == c) for c in set(y)]
+    return np.sum(-p * np.log2(p) for p in probs)
+
+
+def info_gain(Xj, y, threshold):
+    less_than = np.where(Xj <= threshold)[0]
+    greater_than = np.where(Xj > threshold)[0]
+    prob_less = len(less_than) / float(len(Xj))
+    H_less = entropy(y[less_than])
+    H_greater = entropy(y[greater_than])
+    cond_H = prob_less * H_less + (1-prob_less) * H_greater
+    return entropy(y) - cond_H
+
+
 def main():
     pass
 
