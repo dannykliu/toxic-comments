@@ -12,6 +12,10 @@ from string import punctuation
 from collections import defaultdict
 import json
 import re
+from nltk.stem import PorterStemmer
+from nltk.tokenize import WhitespaceTokenizer
+from nltk.tokenize import word_tokenize
+from nltk.corpus import stopwords
 
 
 def load(infile):
@@ -98,6 +102,12 @@ def extract_words_nolower(input_string):
 
 
 def clean_text(text):
+    """ Removes punctuation, capitalizations, numbers, stop words, and stems words"""
+    ps = PorterStemmer()
+
+    stop_words = set(stopwords.words('english'))
+  
+    text=text.lower()
     text = re.sub(r"what's", "what is ", text)
     text = re.sub(r"\'s", " ", text)
     text = re.sub(r"\'ve", " have ", text)
@@ -108,9 +118,17 @@ def clean_text(text):
     text = re.sub(r"\'d", " would ", text)
     text = re.sub(r"\'ll", " will ", text)
     text = re.sub(r"\'scuse", " excuse ", text)
-    text = re.sub('\W', ' ', text)
+    text = re.sub('\W', ' ', text)  # remove punctuation
     text = re.sub('\s+', ' ', text)
+    text = re.sub('\d+', ' ', text) # remove numbers
     text = text.strip(' ')
+
+    # stem words
+    tokenizer = WhitespaceTokenizer()
+    tokenized_comment = tokenizer.tokenize(text) 
+    filtered_sentence = [w for w in tokenized_comment if not w in stop_words]
+    stemmed_comment = [ps.stem(word) for word in filtered_sentence]
+    text = " ".join(stemmed_comment)
     return text
 
 
@@ -139,7 +157,6 @@ def get_data2(infile):
     raw_data = load(infile)
     comments, y = extract(raw_data)
     return np.asarray(comments), np.asarray(y)
-
 
 def get_data(infile):
     """
