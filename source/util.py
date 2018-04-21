@@ -158,6 +158,7 @@ def get_data2(infile):
     comments, y = extract(raw_data)
     return np.asarray(comments), np.asarray(y)
 
+
 def get_data(infile):
     """
     Uses bag of words representation to create feature matrix X. Also returns output labels y.
