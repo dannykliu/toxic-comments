@@ -16,7 +16,7 @@ from nltk.stem import PorterStemmer
 from nltk.tokenize import WhitespaceTokenizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
-
+import contractions
 
 def load(infile):
     """
@@ -108,6 +108,7 @@ def clean_text(text):
     stop_words = set(stopwords.words('english'))
   
     text=text.lower()
+    text=contractions.expandContractions(text)
     text = re.sub(r"what's", "what is ", text)
     text = re.sub(r"\'s", " ", text)
     text = re.sub(r"\'ve", " have ", text)
