@@ -13,43 +13,31 @@ from sklearn.model_selection import train_test_split
 from sklearn.utils import class_weight
 from sklearn.feature_extraction.text import TfidfVectorizer
 import matplotlib.pyplot as plt
+from sklearn import preprocessing
 
 import time
 
 
 def main():
-    X, y = util.get_data2('../data/subset.csv')
-    # capitalization percentage
-    cap_per = util.get_cap_percentage(X, y)
-    # exclamation point percentage
-    ex_per = util.get_exclamation_percentage(X, y)
-    print(cap_per.shape, ex_per.shape)
-    for i in range(len(cap_per)):
-        print(cap_per[i], end=' ')
-        print(ex_per[i], end=' ')
-    print(ex_per.shape, cap_per.shape)
-
+    X, y, raw = util.get_data('../data/subset.csv')
+    # get homegrown features
+    new_features = util.get_features(raw)
 
     # split on tfidf, then only select columns
     vect = TfidfVectorizer(max_features=None, min_df=2)
     X_dtm = vect.fit_transform(X)
-    print("old shape", X_dtm.shape)
 
     # finding info gains
     t1 = time.time()
-    info_gains = np.apply_along_axis(util.info_gain, 0, X_dtm.toarray(), y, 0.00001)
-    print("took", time.time() - t1, 'seconds')
+    info_gains = np.apply_along_axis(util.info_gain, 0, X_dtm.toarray(), y, 0.0001)
+    print("info gain took", time.time() - t1, 'seconds')
     max_cols = info_gains.argsort()[-2000:][::-1]
 
-    # # printing vocab
+    # printing vocab
     # vocab = vect.vocabulary_
     # inv_map = {v: k for k, v in vocab.iteritems()}
-    # arr = []
     # for i in range(len(max_cols)):
-    #     arr.append(inv_map[max_cols[i]])
-    # arr.sort()
-    # for i in range(len(arr)):
-    #     print(arr[i], end=' ')
+    #     print(inv_map[max_cols[i]], end=' ')
 
     # # plotting for tfidf threshold
     # zeros = np.where(y == 0)[0]
@@ -60,18 +48,18 @@ def main():
     # plt.show()
 
     # num_features = np.arange(500, 2000, 500)
-    num_features = np.arange(300, 2000, 200)
+    num_features = np.arange(500, 2000, 200)
     best_accuracy = 0.0
     best_fbeta = 0.0
     best_recall = 0.0
     for f in num_features:
         max_cols = info_gains.argsort()[-f:][::-1]
-        X = X_dtm[:, max_cols]
-        print("old shape", X.shape)
-        X = np.c_[X, ex_per]
-        X = np.c_[X, cap_per]
-        print("new shape", X.shape)
-
+        # turn X from sparse matrix to numpy array
+        X = X_dtm[:, max_cols].toarray()
+        # add our features as columns to X
+        for new_feature in new_features:
+            X = np.append(X, new_feature.reshape(-1, 1), axis=1)
+        print("new X shape", X.shape)
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
         baseline = DummyClassifier(strategy='stratified')
         baseline.fit(X_train, y_train)
@@ -103,7 +91,6 @@ def main():
         #     print("linear svm precision ", precision)
         #     print("linear recall ", recall)
         #     print("linear svm fbeta score", fbeta)
-
 
 
         # TRAINING RBF SVM

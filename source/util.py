@@ -1,22 +1,12 @@
-"""
-Authors: Sasha Friedrich
-         Danny Liu
-         Amelia Sheppard
-         Dalton Varney
-Date:    4/1/18
-Description: Useful functions
-"""
 import numpy as np
 import csv
-from string import punctuation
-from collections import defaultdict
-import json
 import re
 from nltk.stem import PorterStemmer
 from nltk.tokenize import WhitespaceTokenizer
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import contractions
+
 
 def load(infile):
     """
@@ -38,7 +28,7 @@ def load(infile):
     return data
 
 
-def extract(data, clean=True) :
+def extract(data):
     """
     Parameters
     --------------------
@@ -59,49 +49,8 @@ def extract(data, clean=True) :
             y.append(1)
         else: 
             y.append(0)
-        if clean==True: 
-            x.append(clean_text(line[comment_col]))
-        else: 
-            x.append(line[comment_col])
+        x.append(line[comment_col])
     return x, y
-
-
-def extract_words(input_string):
-    """
-    Processes the input_string, separating it into "words" based on the presence
-    of spaces, and separating punctuation marks into their own words.
-
-    Parameters
-    --------------------
-        input_string -- string of characters
-
-    Returns
-    --------------------
-        words        -- list of lowercase "words"
-    """
-
-    for c in punctuation:
-        input_string = input_string.replace(c, ' ' + c + ' ')
-    return input_string.lower().split()
-
-
-def extract_words_nolower(input_string):
-    """
-    Processes the input_string, separating it into "words" based on the presence
-    of spaces, and separating punctuation marks into their own words.
-
-    Parameters
-    --------------------
-        input_string -- string of characters
-
-    Returns
-    --------------------
-        words        -- list of lowercase "words"
-    """
-
-    for c in punctuation:
-        input_string = input_string.replace(c, ' ' + c + ' ')
-    return input_string.split()
 
 
 def clean_text(text):
@@ -110,8 +59,8 @@ def clean_text(text):
 
     stop_words = set(stopwords.words('english'))
   
-    text=text.lower()
-    text=contractions.expandContractions(text)
+    text = text.lower()
+    text = contractions.expandContractions(text)
     text = re.sub(r"what's", "what is ", text)
     text = re.sub(r"\'s", " ", text)
     text = re.sub(r"\'ve", " have ", text)
@@ -139,53 +88,22 @@ def clean_text(text):
     return text
 
 
-def create_and_write_dictionary(datafile, bagfile):
-    """
-    Create dictionary from all words in training data and write to text file
-    """
-    raw_data = load(datafile)
-    comments, y = extract(raw_data)
-    word_list = defaultdict(int)
-    for comment in comments:
-        words = extract_words(clean_text(comment))
-        for word in words:
-            word_list[word] += 1
-    print len(word_list)
-    new_word_list = defaultdict(int)
-    for key in word_list:
-        if word_list[key] > 2:
-            new_word_list[key] = word_list[key]
-    with open(bagfile, 'w') as f:
-        f.write(json.dumps(new_word_list))
-        f.close()
-
-
-def get_data2(infile, clean=True):
-    raw_data = load(infile)
-    comments, y = extract(raw_data, clean)
-    return np.asarray(comments), np.asarray(y)
-
-
-def get_data(infile):
-    """
-    Uses bag of words representation to create feature matrix X. Also returns output labels y.
-    """
+def get_data(infile, clean=True):
     raw_data = load(infile)
     comments, y = extract(raw_data)
-    word_list = json.load(open('../data/bagfile_subset.json'))
-    word_to_index = {}
-    i = 0
-    for word in word_list:
-        word_to_index[word] = i
-        i += 1
-    n, d = len(comments), len(word_list)
-    X = np.zeros((n, d))
-    for i in range(len(comments)):
-        words = extract_words(comments[i])
-        for j in range(len(words)):
-            if words[j] in word_list:
-                X[i, word_to_index[words[j]]] = 1
-    return np.asarray(X), np.asarray(y)
+    raw = np.array(comments)
+    if clean:
+        for i in range(len(comments)):
+            comments[i] = clean_text(comments[i])
+    return np.array(comments), np.array(y), raw
+
+
+def get_features(comments):
+    cap_per = get_cap_percentage(comments)
+    p_ind1, p_ind2 = get_period_indicators(comments)
+    ex_ind1, ex_ind2, ex_ind3, ex_ind4, ex_ind5 = get_exclamation_indicators(comments)
+    features = [cap_per, p_ind1, p_ind2, ex_ind1, ex_ind2, ex_ind3, ex_ind4, ex_ind4, ex_ind5]
+    return np.array(features)
 
 
 def entropy(y):
@@ -203,7 +121,7 @@ def info_gain(Xj, y, threshold):
     return entropy(y) - cond_H
 
 
-def get_cap_percentage(X, y):
+def get_cap_percentage(X):
     """
     Gets the capitalization percentage for each comment.
     """
@@ -211,32 +129,62 @@ def get_cap_percentage(X, y):
     for comment in X:
         stripped_comment = comment.replace(" ", "")
         if len(stripped_comment) != 0:
-            cap_count = 0
             uppers = [l for l in stripped_comment if l.isupper()]
             percentage = 1.0*len(uppers)/len(stripped_comment)
             cap_per.append(percentage)
         else:
             cap_per.append(0)
-    np_cap = np.array(cap_per)
-    return np_cap
+    return np.array(cap_per)
 
 
-def get_exclamation_percentage(X, y):
+def get_exclamation_indicators(X):
     """
     Gets the exclamation point percentage for each comment.
     """
-    ex_per = []
+    no_ex = []
+    one_ex = []
+    two_ex = []
+    three_four_ex = []
+    five_plus_ex = []
     for comment in X:
-        stripped_comment = comment.replace(" ", "")
-        if len(stripped_comment) != 0:
-            ex_count = 0
-            excl = [l for l in stripped_comment if l=="!"]
-            percentage = 1.0*len(excl)/len(stripped_comment)
-            ex_per.append(percentage)
+        count = comment.count('!')
+        if count == 0:
+            no_ex.append(1)
         else:
-            ex_per.append(0)
-    np_ex = np.array(ex_per)
-    return np_ex
+            no_ex.append(0)
+        if count == 1:
+            one_ex.append(1)
+        else:
+            one_ex.append(0)
+        if count == 2:
+            two_ex.append(1)
+        else:
+            two_ex.append(0)
+        if count == 3 or count == 4:
+            three_four_ex.append(1)
+        else:
+            three_four_ex.append(0)
+        if count >= 5:
+            five_plus_ex.append(1)
+        else:
+            five_plus_ex.append(0)
+    return np.array(no_ex), np.array(one_ex), np.array(two_ex), np.array(three_four_ex), np.array(five_plus_ex)
+
+
+def get_period_indicators(X):
+    no_periods = []
+    two_periods = []
+    for comment in X:
+        count = comment.count('.')
+        if count == 0:
+            no_periods.append(1)
+        else:
+            no_periods.append(0)
+        if count >= 1:
+            two_periods.append(1)
+        else:
+            two_periods.append(0)
+    return np.array(no_periods), np.array(two_periods)
 
 
 def main():

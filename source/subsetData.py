@@ -10,8 +10,6 @@ outputfile: 'subsampled_train.csv'
 
 # numpy libraries
 import numpy as np
-
-import util
 import csv
 
 
@@ -66,7 +64,7 @@ def subset_data(infile, outfile):
     ratio = 0.04
     num_toxic = int(ratio * len(toxic_indices))
     num_nontoxic = int(ratio * len(nontoxic_indices))
-    print num_toxic, num_nontoxic
+    print "num toxic", num_toxic, "num nontoxic", num_nontoxic
     write_data(outfile, data, header, toxic_indices, nontoxic_indices, num_toxic, num_nontoxic)
 
 
