@@ -197,6 +197,36 @@ def info_gain(Xj, y, threshold):
     return entropy(y) - cond_H
 
 
+def get_cap_percentage(X, y):
+    """
+    Gets the capitalization percentage for each comment.
+    """
+    cap_per = []
+    for comment in X:
+        stripped_comment = comment.replace(" ", "")
+        cap_count = 0
+        uppers = [l for l in stripped_comment if l.isupper()]
+        percentage = 1.0*len(uppers)/len(stripped_comment)
+        cap_per.append(percentage)
+    np_cap = np.array(cap_per)
+    return np_cap
+
+
+def get_exclamation_percentage(X, y):
+    """
+    Gets the exclamation point percentage for each comment.
+    """
+    ex_per = []
+    for comment in X:
+        stripped_comment = comment.replace(" ", "")
+        ex_count = 0
+        excl = [l for l in stripped_comment if l=="!"]
+        percentage = 1.0*len(excl)/len(stripped_comment)
+        ex_per.append(percentage)
+    np_ex = np.array(ex_per)
+    return np_ex
+
+
 def main():
     pass
 

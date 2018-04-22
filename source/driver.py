@@ -32,10 +32,14 @@ def main():
     max_cols = info_gains.argsort()[-2000:][::-1]
 
     # printing vocab
-    # vocab = vect.vocabulary_
-    # inv_map = {v: k for k, v in vocab.iteritems()}
-    # for i in range(len(max_cols)):
-    #     print(inv_map[max_cols[i]], end=' ')
+    vocab = vect.vocabulary_
+    inv_map = {v: k for k, v in vocab.iteritems()}
+    arr = []
+    for i in range(len(max_cols)):
+        arr.append(inv_map[max_cols[i]])
+    arr.sort()
+    for i in range(len(arr)):
+        print(arr[i], end=' ')
 
     # # plotting for tfidf threshold
     # zeros = np.where(y == 0)[0]
@@ -46,7 +50,7 @@ def main():
     # plt.show()
 
     # num_features = np.arange(500, 2000, 500)
-    num_features = [2000]
+    num_features = np.arange(300, 2000, 200)
     best_accuracy = 0.0
     best_fbeta = 0.0
     best_recall = 0.0
