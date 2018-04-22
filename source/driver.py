@@ -19,6 +19,16 @@ import time
 
 def main():
     X, y = util.get_data2('../data/subset.csv')
+    # capitalization percentage
+    cap_per = util.get_cap_percentage(X, y)
+    # exclamation point percentage
+    ex_per = util.get_exclamation_percentage(X, y)
+    print(cap_per.shape, ex_per.shape)
+    for i in range(len(cap_per)):
+        print(cap_per[i], end=' ')
+        print(ex_per[i], end=' ')
+    print(ex_per.shape, cap_per.shape)
+
 
     # split on tfidf, then only select columns
     vect = TfidfVectorizer(max_features=None, min_df=2)
@@ -31,15 +41,15 @@ def main():
     print("took", time.time() - t1, 'seconds')
     max_cols = info_gains.argsort()[-2000:][::-1]
 
-    # printing vocab
-    vocab = vect.vocabulary_
-    inv_map = {v: k for k, v in vocab.iteritems()}
-    arr = []
-    for i in range(len(max_cols)):
-        arr.append(inv_map[max_cols[i]])
-    arr.sort()
-    for i in range(len(arr)):
-        print(arr[i], end=' ')
+    # # printing vocab
+    # vocab = vect.vocabulary_
+    # inv_map = {v: k for k, v in vocab.iteritems()}
+    # arr = []
+    # for i in range(len(max_cols)):
+    #     arr.append(inv_map[max_cols[i]])
+    # arr.sort()
+    # for i in range(len(arr)):
+    #     print(arr[i], end=' ')
 
     # # plotting for tfidf threshold
     # zeros = np.where(y == 0)[0]
@@ -57,6 +67,9 @@ def main():
     for f in num_features:
         max_cols = info_gains.argsort()[-f:][::-1]
         X = X_dtm[:, max_cols]
+        print("old shape", X.shape)
+        X = np.c_[X, ex_per]
+        X = np.c_[X, cap_per]
         print("new shape", X.shape)
 
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
