@@ -38,7 +38,7 @@ def load(infile):
     return data
 
 
-def extract(data) :
+def extract(data, clean=True) :
     """
     Parameters
     --------------------
@@ -59,7 +59,10 @@ def extract(data) :
             y.append(1)
         else: 
             y.append(0)
-        x.append(clean_text(line[comment_col]))
+        if clean==True: 
+            x.append(clean_text(line[comment_col]))
+        else: 
+            x.append(line[comment_col])
     return x, y
 
 
@@ -154,9 +157,9 @@ def create_and_write_dictionary(datafile, bagfile):
         f.close()
 
 
-def get_data2(infile):
+def get_data2(infile, clean=True):
     raw_data = load(infile)
-    comments, y = extract(raw_data)
+    comments, y = extract(raw_data, clean)
     return np.asarray(comments), np.asarray(y)
 
 def get_data(infile):
