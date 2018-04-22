@@ -125,6 +125,9 @@ def clean_text(text):
     text = re.sub('\W', ' ', text)  # remove punctuation
     text = re.sub('\s+', ' ', text)
     text = re.sub('\d+', ' ', text) # remove numbers
+    text = re.sub(r'(.)\1\1+', r'\1\1', text) # letters repeated 3 or more times in a row are repeated twice
+    text= re.sub(r'(ha)\1\1+', r'haha', text) 
+    text= re.sub(r'(lo)\1\1+', r'lol', text)
     text = text.strip(' ')
 
     # stem words
