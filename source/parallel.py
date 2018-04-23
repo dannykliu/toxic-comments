@@ -20,7 +20,7 @@ import time
 
 
 
-def trainRBF(metrics,i, j, f, X_train, y_train, X_test, y_test, C_range, gamma_range):
+def trainRBF(j,i, metricsQueue, f, X_train, y_train, X_test, y_test, C_range, gamma_range):
     beta = 2
     t1 = time.time()
     # weights = class_weight.compute_class_weight('balanced', np.unique(y_train), y_train)
@@ -126,9 +126,9 @@ def main():
         C_range = [100]
         gamma_range = np.logspace(-2, 1, 10)
         pool = multiprocessing.Pool(processes=10)
-        metrics=Queue()
+        metricsQ=Queue()
         for i in range(len(C_range)):
-            rbf_parallel=partial(j, i=i, metrics=metrics, f=f, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
+            rbf_parallel=partial(j, i=i, metricsQueue=metricsQ, f=f, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
             p=pool.map(rbf_parallel, np.arange(len(gamma_range)))
             p.start()
     
