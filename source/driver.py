@@ -131,17 +131,23 @@ def train_rbf(X_train, X_test, y_train, y_test):
 
 def train_rf(X_train, X_test, y_train, y_test):
     best_accuracy, best_fbeta, best_recall, best_specificity = 0, 0, 0, 0
-    depths = np.arange(40, 50, 2)
-    estimators = np.arange(20, 50, 2)
+    # depths = np.arange(40, 80, 4)
+    # estimators = np.arange(20, 50, 4)
+    depths = [80, 90, 100, 110]
+    estimators = [10, 20, 30]
+    min_impurity_decrease = [0]  # np.arange(0, 0.0002, 0.00002)
+    min_samples_leaf = np.arange(1, 10, 1)
     for i in range(len(depths)):
         for j in range(len(estimators)):
-            t1 = time.time()
-            rf = RandomForestClassifier(max_depth=depths[i], n_estimators=estimators[i])
-            rf.fit(X_train, y_train)
-            print('---------------------------------')
-            print("Depth: ", depths[i], "Estimators: ", estimators[j])
-            print('training took ' + str(time.time() - t1) + ' seconds')
-            best_accuracy, best_fbeta, best_recall, best_specificity = report_metrics('rf', rf, X_train, X_test, y_train, y_test, best_accuracy, best_fbeta, best_recall, best_specificity)
+            for k in range(len(min_impurity_decrease)):
+                for l in range(len(min_samples_leaf)):
+                    t1 = time.time()
+                    rf = RandomForestClassifier(max_depth=depths[i], n_estimators=estimators[j], min_impurity_decrease=min_impurity_decrease[k], min_samples_leaf=min_samples_leaf[l], class_weight='balanced_subsample')
+                    rf.fit(X_train, y_train)
+                    print('---------------------------------')
+                    print("Depth: ", depths[i], "Estimators: ", estimators[j], "Impurity Decrease: ", min_impurity_decrease[k], 'Min Samples leaf: ', min_samples_leaf[l])
+                    print('training took ' + str(time.time() - t1) + ' seconds')
+                    best_accuracy, best_fbeta, best_recall, best_specificity = report_metrics('rf', rf, X_train, X_test, y_train, y_test, best_accuracy, best_fbeta, best_recall, best_specificity)
 
     print("\nrf best test accuracy", best_accuracy)
     print("rf best f2", best_fbeta)
@@ -156,7 +162,7 @@ def main():
     vect = TfidfVectorizer(min_df=2)
     X_dtm = vect.fit_transform(X)
     info_gains = np.apply_along_axis(util.info_gain, 0, X_dtm.toarray(), y, 0.00001)
-    num_features = 2000
+    num_features = 900
     max_cols = info_gains.argsort()[-num_features:][::-1]
     # print_vocab(vect, max_cols)
     X = X_dtm[:, max_cols].toarray()  # turn X from sparse matrix to numpy array

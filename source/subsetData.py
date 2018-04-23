@@ -61,7 +61,7 @@ def subset_data(infile, outfile):
     Create subset of 20% of original dataset, with same class proportions as original dataset
     """
     data, header, toxic_indices, nontoxic_indices = get_indices(infile)
-    ratio = 0.08
+    ratio = 0.16
     num_toxic = int(ratio * len(toxic_indices))
     num_nontoxic = int(ratio * len(nontoxic_indices))
     print "num toxic", num_toxic, "num nontoxic", num_nontoxic
