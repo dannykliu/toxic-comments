@@ -120,7 +120,7 @@ def train_rbf(X_train, X_test, y_train, y_test):
     gamma_range = np.logspace(-2, 1, 10)
     pool = multiprocessing.Pool(processes=10)
     for i in range(len(C_range)):
-        rbf_parallel=partial(parallel_rbf, i=i, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
+        rbf_parallel=partial(parallel_rbf, i=i, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range, best_accuracy=best_accuracy, best_fbeta=best_fbeta, best_recall=best_recall, best_specificity=best_specificity)
         p=pool.map(rbf_parallel, gamma_range)
         p.start()
         p.join()
@@ -130,22 +130,19 @@ def train_rbf(X_train, X_test, y_train, y_test):
     # print("best specificity", best_specificity)
 
 
-def parallel_rbf(j, i, X_train, X_test, y_train, y_test, C_range, gamma_range):
-    best_accuracy, best_fbeta, best_recall, best_specificity = 0, 0, 0, 0
-    for i in range(len(C_range)):
-        for j in range(len(gamma_range)):
-            t1 = time.time()
-            rbf_svm = SVC(kernel='rbf', C=C_range[i], gamma=gamma_range[j], class_weight='balanced')
-            rbf_svm.fit(X_train, y_train)
-            print('---------------------------------')
-            print("C: ", C_range[i], "gamma: ", gamma_range[j])
-            print('training took ' + str(time.time() - t1) + ' seconds')
-            best_accuracy, best_fbeta, best_recall, best_specificity = report_metrics('rbf', rbf_svm, X_train, X_test, y_train, y_test, best_accuracy, best_fbeta, best_recall, best_specificity, C=C_range[i], gamma=gamma_range[j])
+def parallel_rbf(j, i, X_train, X_test, y_train, y_test, C_range, gamma_range, best_accuracy, best_fbeta, best_recall, best_specificity):
+    t1 = time.time()
+    rbf_svm = SVC(kernel='rbf', C=C_range[i], gamma=gamma_range[j], class_weight='balanced')
+    rbf_svm.fit(X_train, y_train)
+    print('---------------------------------')
+    print("C: ", C_range[i], "gamma: ", gamma_range[j])
+    print('training took ' + str(time.time() - t1) + ' seconds')
+    best_accuracy, best_fbeta, best_recall, best_specificity = report_metrics('rbf', rbf_svm, X_train, X_test, y_train, y_test, best_accuracy, best_fbeta, best_recall, best_specificity, C=C_range[i], gamma=gamma_range[j])
 
-    print("\nbest test accuracy", best_accuracy)
-    print("best f2", best_fbeta)
-    print("best recall", best_recall)
-    print("best specificity", best_specificity)
+    # print("\nbest test accuracy", best_accuracy)
+    # print("best f2", best_fbeta)
+    # print("best recall", best_recall)
+    # print("best specificity", best_specificity)
 
 
 def train_rf(X_train, X_test, y_train, y_test):
