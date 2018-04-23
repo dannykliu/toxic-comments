@@ -17,10 +17,10 @@ from sklearn import preprocessing
 import multiprocessing
 import Queue
 import time
+from functools import partial
 
 
-
-def trainRBF(j,i, metricsQueue, f, X_train, y_train, X_test, y_test, C_range, gamma_range):
+def trainRBF(j,i, f, X_train, y_train, X_test, y_test, C_range, gamma_range):
     beta = 2
     t1 = time.time()
     # weights = class_weight.compute_class_weight('balanced', np.unique(y_train), y_train)
@@ -44,7 +44,7 @@ def trainRBF(j,i, metricsQueue, f, X_train, y_train, X_test, y_test, C_range, ga
     print("rbf test recall ", recall)
     print("rbf test fbeta score", fbeta)
     
-    metrics.put((i, j, test_accuracy, fbeta, recall))
+    return i, j, test_accuracy, fbeta, recall
 
 def main():
     X, y, raw = util.get_data('../data/subset.csv')
@@ -126,14 +126,12 @@ def main():
         C_range = [100]
         gamma_range = np.logspace(-2, 1, 10)
         pool = multiprocessing.Pool(processes=10)
-        metricsQ=Queue()
         for i in range(len(C_range)):
-            rbf_parallel=partial(j, i=i, metricsQueue=metricsQ, f=f, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
+            rbf_parallel=partial(trainRBF, i=i, f=f, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
             p=pool.map(rbf_parallel, np.arange(len(gamma_range)))
             p.start()
+            p.join()
     
-        print metrics.get()
-
 
                 # if test_accuracy > best_accuracy:
                 #     best_accuracy = test_accuracy
