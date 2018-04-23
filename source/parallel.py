@@ -130,6 +130,7 @@ def main():
             rbf_parallel=partial(trainRBF, i=i, f=f, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
             p=pool.map(rbf_parallel, np.arange(len(gamma_range)))
             p.start()
+            p.join()
     
 
                 # if test_accuracy > best_accuracy:
