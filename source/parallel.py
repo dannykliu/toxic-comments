@@ -17,7 +17,7 @@ from sklearn import preprocessing
 import multiprocessing
 import Queue
 import time
-
+from functools import partial
 
 
 def trainRBF(j,i, f, X_train, y_train, X_test, y_test, C_range, gamma_range):
@@ -127,7 +127,7 @@ def main():
         gamma_range = np.logspace(-2, 1, 10)
         pool = multiprocessing.Pool(processes=10)
         for i in range(len(C_range)):
-            rbf_parallel=partial(j, i=i, f=f, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
+            rbf_parallel=partial(trainRBF, i=i, f=f, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
             p=pool.map(rbf_parallel, np.arange(len(gamma_range)))
             p.start()
     
