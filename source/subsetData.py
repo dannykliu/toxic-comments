@@ -1,11 +1,9 @@
-# numpy libraries
 import numpy as np
 import csv
+import sys
 
 
 def get_indices(infile):
-    """
-    """
     predict_cols = [2, 3, 4, 5, 6, 7]
     data = []   # list of lists, where each sublist is a line of the csv file
     toxic_indices = []  # indices in data (lines of csv file) where comment contains SOME level of toxicity
@@ -46,18 +44,6 @@ def write_data(outfile, data, header, toxic_indices, nontoxic_indices, num_toxic
             out.writerow(data[i])
 
 
-def subset_data(infile, outfile):
-    """
-    Create subset of 20% of original dataset, with same class proportions as original dataset
-    """
-    data, header, toxic_indices, nontoxic_indices = get_indices(infile)
-    ratio = 0.25
-    num_toxic = int(ratio * len(toxic_indices))
-    num_nontoxic = int(ratio * len(nontoxic_indices))
-    print "num toxic", num_toxic, "num nontoxic", num_nontoxic
-    write_data(outfile, data, header, toxic_indices, nontoxic_indices, num_toxic, num_nontoxic)
-
-
 def subsample_data(infile, outfile, n):
     """
     Subsample dataset with n examples of positive class and n examples of negative class
@@ -66,8 +52,22 @@ def subsample_data(infile, outfile, n):
     write_data(outfile, data, header, toxic_indices, nontoxic_indices, n, n)
 
 
-subset_data('../data/train.csv', '../data/subset.csv')
-# util.create_and_write_dictionary('../data/subset.csv', '../data/bagfile_subset.json')
+def subset_data(infile, outfile, ratio):
+    """
+    Create subset of ratio % of original dataset, with same class proportions as original dataset
+    """
+    data, header, toxic_indices, nontoxic_indices = get_indices(infile)
+    num_toxic = int(ratio * len(toxic_indices))
+    num_nontoxic = int(ratio * len(nontoxic_indices))
+    print "num toxic", num_toxic, "num nontoxic", num_nontoxic
+    write_data(outfile, data, header, toxic_indices, nontoxic_indices, num_toxic, num_nontoxic)
 
-# subsample_data('../data/train.csv', '../data/subsample.csv', 2000)
-# util.create_and_write_dictionary('../data/subsample.csv', '../data/bagfile_subsample.json')
+
+def main():
+    assert(len(sys.argv) == 2)
+    ratio = sys.argv[-1]
+    subset_data('../data/train.csv', '../data/subset.csv', ratio)
+
+
+if __name__ == '__main__':
+    main()

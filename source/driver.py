@@ -134,7 +134,7 @@ def train_rbf(X_train, X_test, y_train, y_test):
             print('---------------------------------')
             print("C: ", C_range[i], "gamma: ", gamma_range[j])
             print('training took ' + str(time.time() - t1) + ' seconds')
-            best_accuracy, best_fbeta, best_recall, best_specificity = report_metrics('rbf', rbf_svm, X_train, X_test, y_train, y_test, best_accuracy, best_fbeta, best_recall, best_specificity)
+            best_accuracy, best_fbeta, best_recall, best_specificity, train_accuracy, test_accuracy, f_beta = report_metrics('rbf', rbf_svm, X_train, X_test, y_train, y_test, best_accuracy, best_fbeta, best_recall, best_specificity)
 
     print("\nbest test accuracy", best_accuracy)
     print("best f2", best_fbeta)
