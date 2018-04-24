@@ -66,7 +66,7 @@ def subset_data(infile, outfile, ratio):
 def main():
     assert(len(sys.argv) == 2)
     ratio = sys.argv[-1]
-    subset_data('../data/train.csv', '../data/subset.csv', ratio)
+    subset_data('../data/train.csv', '../data/subset.csv', float(ratio))
 
 
 if __name__ == '__main__':
