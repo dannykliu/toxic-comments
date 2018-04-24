@@ -3,7 +3,6 @@ import csv
 import re
 from nltk.stem import PorterStemmer
 from nltk.tokenize import WhitespaceTokenizer
-from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import contractions
 

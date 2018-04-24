@@ -4,76 +4,73 @@ import util
 import numpy as np
 
 # scikit-learn libraries
-from sklearn.dummy import DummyClassifier
 from sklearn.svm import SVC
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import StratifiedKFold
 from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.feature_extraction.text import TfidfVectorizer
-import matplotlib.pyplot as plt
 import time
 import multiprocessing
 from functools import partial
 
 
-def get_metrics(y_test, y_test_pred, y_train, y_train_pred):
-    beta = 2.0
-    confusion_matrix = metrics.confusion_matrix(y_true=y_test, y_pred=y_test_pred)
-    if confusion_matrix[0, 0] + confusion_matrix[0, 1] == 0:
-        specificity = 0
-    else:
-        specificity = float(confusion_matrix[0, 0]) / (confusion_matrix[0, 0] + confusion_matrix[0, 1])
+def get_metrics(y_true, y_pred):
+    beta = 1.5
+    confusion_matrix = metrics.confusion_matrix(y_true=y_pred, y_pred=y_pred)
     if confusion_matrix[1, 1] + confusion_matrix[1, 0] == 0:
-        recall = 0
+        recall = float('NaN')
     else:
         recall = float(confusion_matrix[1, 1]) / (confusion_matrix[1, 1] + confusion_matrix[1, 0])
     if confusion_matrix[1, 1] + confusion_matrix[0, 1] == 0:
-        precision = 0
+        precision = float('NaN')
     else:
         precision = float(confusion_matrix[1, 1]) / (confusion_matrix[1, 1] + confusion_matrix[0, 1])
     if beta ** 2 * precision + recall == 0:
-        fbeta = 0
+        fbeta = float('NaN')
     else:
         fbeta = (1 + beta ** 2) * precision * recall / (beta ** 2 * precision + recall)
-    test_accuracy = float(np.sum(y_test == y_test_pred)) / len(y_train)
-    train_accuracy = float(np.sum(y_train == y_train_pred)) / len(y_train)
-    return test_accuracy, train_accuracy, fbeta, precision, recall, specificity
+    accuracy = float(np.sum(y_true == y_pred)) / len(y_true)
+    return accuracy, precision, recall, fbeta
 
 
-def report_metrics(name, clf, X_train, X_test, y_train, y_test, C=None, gamma=None):
-    t1 = time.time()
-    y_test_pred = clf.predict(X_test)
-    y_train_pred = clf.predict(X_train)
-    test_accuracy, train_accuracy, fbeta, precision, recall, specificity = get_metrics(y_test, y_test_pred, y_train, y_train_pred)
-    print("--------------------------")
-    if C != None and gamma != None: 
+def report_cv_performance(name, clf, X, y, kf, C, gamma):
+    if C and gamma:
         print("C: ", C, "gamma: ", gamma)
-    print(name, "train accuracy", train_accuracy)
-    print(name, "test accuracy", test_accuracy)
-    print(name, "test precision", precision)
-    print(name, "test recall", recall)
-    print(name, "test specificity", specificity)
-    print(name, "test f2 score", fbeta)
-    print("metrics and predictions took " + str(time.time() - t1) + ' seconds')
+    accuracies, precisions, recalls, fbetas = [], [], [], []
+    for train, test in kf.split(X, y):
+        X_train, X_test, y_train, y_test = X[train], X[test], y[train], y[test]
+        clf.fit(X_train, y_train)
+        y_pred = clf.predict(X_test)
+        accuracy, precision, recall, fbeta = get_metrics(y_true=y_test, y_pred=y_pred)
+        if not np.isnan(accuracy):
+            accuracies.append(accuracy)
+        if not np.isnan(precision):
+            precisions.append(precision)
+        if not np.isnan(recall):
+            recalls.append(recall)
+        if not np.isnan(fbeta):
+            fbetas.append(fbeta)
+    print("--------------------------")
+    print(name, "cv accuracy", np.mean(accuracies))
+    print(name, "cv precision", np.mean(precisions))
+    print(name, "cv recall", np.mean(recalls))
+    print(name, "cv f1.5 score", np.mean(fbetas))
 
 
-def parallel_rbf(j, i, X_train, X_test, y_train, y_test, C_range, gamma_range):
-    t1 = time.time()
-    rbf_svm = SVC(kernel='rbf', C=C_range[i], gamma=gamma_range[j], class_weight='balanced')
-    rbf_svm.fit(X_train, y_train)
-    print('training took ' + str(time.time() - t1) + ' seconds')
-    report_metrics('rbf', rbf_svm, X_train, X_test, y_train, y_test, C=C_range[i], gamma=gamma_range[j])
+def parallel_rbf(j, i, X, y, kf, C_range, gamma_range):
+    clf = SVC(kernel='rbf', C=C_range[i], gamma=gamma_range[j], class_weight='balanced')
+    report_cv_performance('rbf', clf, X=X, y=y, kf=kf, C=C_range[i], gamma=gamma_range[j])
 
 
-def train_rbf(X_train, X_test, y_train, y_test):
+def tune_rbf(X, y):
+    skf = StratifiedKFold(n_splits=5)
     C_range = [0.01, 0.1, 1.0, 10.0, 100.0]
     gamma_range = np.logspace(-2, 1, 10)
     pool = multiprocessing.Pool(processes=10)
     for i in range(len(C_range)):
-        rbf_parallel = partial(parallel_rbf, i=i, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range)
+        rbf_parallel = partial(parallel_rbf, i=i, X=X, y=y, kf=skf, C_range=C_range, gamma_range=gamma_range)
         p = pool.map(rbf_parallel, range(len(gamma_range)))
-        #p.start()
+        # p.start()
     p.join()
 
 
@@ -90,10 +87,9 @@ def main():
     X = X_dtm[:, max_cols].toarray()  # turn X from sparse matrix to numpy array
     for new_feature in new_features:  # add our features as columns to X
         X = np.append(X, new_feature.reshape(-1, 1), axis=1)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2)
-    print(X_train.shape, X_test.shape)
+    print("data matrix shape", X.shape)
     print("preprocessing took", str(time.time() - t1), "seconds")
-    train_rbf(X_train, X_test, y_train, y_test)
+    tune_rbf(X, y)
 
 
 if __name__ == '__main__':
