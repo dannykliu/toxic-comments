@@ -117,7 +117,7 @@ def train_linear(X_train, X_test, y_train, y_test):
 def train_rbf(X_train, X_test, y_train, y_test):
     best_accuracy, best_fbeta, best_recall, best_specificity = 0, 0, 0, 0
     C_range = [0.01, 0.1, 1.0, 10.0, 100.0]
-    gamma_range = np.logspace(-2, 1, 10)
+    gamma_range = np.logspace(-2, 1, 20)
     pool = multiprocessing.Pool(processes=10)
     for i in range(len(C_range)):
         rbf_parallel=partial(parallel_rbf, i=i, X_train=X_train, y_train=y_train, X_test=X_test, y_test=y_test, C_range=C_range, gamma_range=gamma_range, best_accuracy=best_accuracy, best_fbeta=best_fbeta, best_recall=best_recall, best_specificity=best_specificity)
